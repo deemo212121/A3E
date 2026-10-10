@@ -2,7 +2,7 @@
 
 > **Status: PROPOSED, pending accountant approval.** The Phase 5 instruction refers to "the approved chart of accounts". No chart had been approved, so a **generic starter** was seeded as data (`coa_templates` / `coa_template_accounts`, migration `20261010140200`). It is **not** a BIR-prescribed chart. The engine works with **any** chart: the accountant can approve this one, edit it, or supply a different one, and no code changes are needed.
 
-57 accounts. ⊕ = added 2026-10-10 (migration `20261010150100`) after reviewing one client's actual books ([FIRM-WORKBOOK-REVIEW.md](FIRM-WORKBOOK-REVIEW.md)). Clients that already have a chart are not changed; add accounts to them individually.
+58 accounts (2040 added in Phase 7). ⊕ = added 2026-10-10 (migration `20261010150100`) after reviewing one client's actual books ([FIRM-WORKBOOK-REVIEW.md](FIRM-WORKBOOK-REVIEW.md)). Clients that already have a chart are not changed; add accounts to them individually.
 
 | Code | Name | Type | Normal | Postable |
 |---|---|---|---|---|
@@ -24,6 +24,7 @@
 | 2010 | Accounts Payable | liability | credit | ✓ |
 | 2020 | Accrued Expenses | liability | credit | ✓ |
 | 2030 | Salaries and Wages Payable ⊕ | liability | credit | ✓ |
+| 2040 | Advances from Customers ⊕ | liability | credit | ✓ |
 | 2100 | Output Tax (placeholder) | liability | credit | ✓ |
 | 2105 | VAT Payable (placeholder) ⊕ | liability | credit | ✓ |
 | 2110 | Withholding Taxes Payable (placeholder) | liability | credit | ✓ |

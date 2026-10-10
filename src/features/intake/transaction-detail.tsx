@@ -278,6 +278,20 @@ export async function TransactionDetail({
             </Alert>
           ) : (
             <>
+              {txn.kind === "sale" ? (
+                <div className="mb-3">
+                  <Alert tone="info" title="This is a sale">
+                    Record it as a sales invoice so it appears in receivables, aging and payments:{" "}
+                    <Link
+                      className="underline"
+                      href={`${pathFor("staff.sales_invoice_new", { clientId })}?intake=${txn.id}`}
+                    >
+                      Record as a sales invoice
+                    </Link>
+                    . Or book it directly below (not both; the system prevents double booking).
+                  </Alert>
+                </div>
+              ) : null}
               <p className="mb-3 text-sm text-[var(--muted)]">
                 Choose the accounts. The entry goes through the normal review and approval before it
                 is posted; nothing is posted automatically. A transaction can be booked only once.

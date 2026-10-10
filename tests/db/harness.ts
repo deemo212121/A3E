@@ -61,6 +61,10 @@ grant usage on schema storage to anon, authenticated, service_role;
 grant all on storage.objects to anon, authenticated, service_role;
 grant select on storage.buckets to anon, authenticated, service_role;
 
+-- Supabase CLI migration history (files end by recording themselves here).
+create schema supabase_migrations;
+create table supabase_migrations.schema_migrations (version text primary key, name text, statements text[]);
+
 grant usage on schema auth to anon, authenticated, service_role;
 grant execute on all functions in schema auth to anon, authenticated, service_role;
 grant usage on schema public to anon, authenticated, service_role;

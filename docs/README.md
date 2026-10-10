@@ -27,6 +27,8 @@
 | — | [Phase 4 report](PHASE-4-REPORT.md) | Shell and navigation: live route-access results |
 | — | [Phase 5 report](PHASE-5-REPORT.md) | Double-entry engine: accounting, concurrency and duplicate-prevention results |
 | — | [Phase 6 report](PHASE-6-REPORT.md) | Client portal and data intake: retry-safety gate, uploads, imports, live and browser test results |
+| — | [Phase 7 report](PHASE-7-REPORT.md) | Sales and receivables: invoice records, receipts, credit notes, posting rules, reconciliation |
+| sales | [Posting rules](sales/POSTING-RULES.md) | Sales journal entries, rounding, controls (pending CPA review) |
 | intake | [Canonical intake schema](intake/CANONICAL-INTAKE-SCHEMA.md) | Transactions, customers/suppliers, documents, imports, workflow and retry rules (Phase 6) |
 | accounting | [Test scenarios (for accountant sign-off)](accounting/TEST-SCENARIOS.md) · [Starter chart of accounts (PROPOSED)](accounting/COA-TEMPLATE-PROPOSED.md) · [Review of the Firm's client workbooks](accounting/FIRM-WORKBOOK-REVIEW.md) | Phase 5 |
 | design | [Design system](design/DESIGN-SYSTEM.md) · [Information architecture and route access](design/INFORMATION-ARCHITECTURE.md) | Phase 4 (PROPOSED) |

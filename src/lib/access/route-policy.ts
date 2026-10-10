@@ -74,6 +74,11 @@ export type RouteKey =
   | "staff.intake_txn"
   | "staff.imports"
   | "staff.import"
+  | "staff.sales"
+  | "staff.sales_invoice_new"
+  | "staff.sales_invoice"
+  | "staff.sales_receipt_new"
+  | "staff.sales_receipt"
   | "review"
   | "review.assignments"
   | "admin"
@@ -150,6 +155,11 @@ export function evaluateRoute(
     case "staff.intake_txn":
     case "staff.imports":
     case "staff.import":
+    case "staff.sales":
+    case "staff.sales_invoice_new":
+    case "staff.sales_invoice":
+    case "staff.sales_receipt_new":
+    case "staff.sales_receipt":
       if (!hasRole(facts, STAFF_ROLES)) return FORBIDDEN;
       return params.clientId && facts.staffClientIds.includes(params.clientId) ? ALLOW : NOT_FOUND;
 
@@ -234,6 +244,16 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return `/staff/clients/${id}/imports`;
     case "staff.import":
       return `/staff/clients/${id}/imports/${item}`;
+    case "staff.sales":
+      return `/staff/clients/${id}/sales`;
+    case "staff.sales_invoice_new":
+      return `/staff/clients/${id}/sales/invoices/new`;
+    case "staff.sales_invoice":
+      return `/staff/clients/${id}/sales/invoices/${item}`;
+    case "staff.sales_receipt_new":
+      return `/staff/clients/${id}/sales/receipts/new`;
+    case "staff.sales_receipt":
+      return `/staff/clients/${id}/sales/receipts/${item}`;
     case "review":
       return "/review";
     case "review.assignments":
@@ -283,6 +303,11 @@ const MATCHERS: Matcher[] = [
   [new RegExp(`${STAFF_CLIENT}/intake/(${UUID})$`), "staff.intake_txn", "itemId"],
   [new RegExp(`${STAFF_CLIENT}/imports$`), "staff.imports"],
   [new RegExp(`${STAFF_CLIENT}/imports/(${UUID})$`), "staff.import", "itemId"],
+  [new RegExp(`${STAFF_CLIENT}/sales$`), "staff.sales"],
+  [new RegExp(`${STAFF_CLIENT}/sales/invoices/new$`), "staff.sales_invoice_new"],
+  [new RegExp(`${STAFF_CLIENT}/sales/invoices/(${UUID})$`), "staff.sales_invoice", "itemId"],
+  [new RegExp(`${STAFF_CLIENT}/sales/receipts/new$`), "staff.sales_receipt_new"],
+  [new RegExp(`${STAFF_CLIENT}/sales/receipts/(${UUID})$`), "staff.sales_receipt", "itemId"],
   [/^\/review$/, "review"],
   [/^\/review\/assignments$/, "review.assignments"],
   [/^\/admin$/, "admin"],
@@ -406,6 +431,7 @@ export function staffClientTabs(facts: AccessFacts, clientId: string): NavItem[]
     ...item(facts, "staff.client", "Overview", { clientId }),
     ...item(facts, "staff.intake", "Intake", { clientId }),
     ...item(facts, "staff.imports", "Imports", { clientId }),
+    ...item(facts, "staff.sales", "Sales & receivables", { clientId }),
     ...item(facts, "staff.journal", "Journal", { clientId }),
     ...item(facts, "staff.trial_balance", "Trial balance", { clientId }),
     ...item(facts, "staff.ledger", "General ledger", { clientId }),
