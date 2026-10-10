@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Format, lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Placeholders only; the build must not require real secrets.
+      APP_ENV: test
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build
+      - name: Scan browser bundles for secrets
+        run: npm run check:secrets
+
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run gitleaks
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/repo" ghcr.io/gitleaks/gitleaks:v8.18.4 \
+            detect --source /repo --redact --verbose --exit-code 1
+
+  live-tenant-isolation:
+    name: Live cross-tenant API tests (dev project)
+    # Runs only when the dev-project secrets are configured in GitHub.
+    if: ${{ github.event_name == 'push' && vars.RUN_LIVE_TESTS == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      APP_ENV: test
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.DEV_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.DEV_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SECRET_KEY: ${{ secrets.DEV_SUPABASE_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run test:integration
+
+  database:
+    name: Database migrations (local Supabase)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Start local Supabase
+        run: npx supabase start
+      - name: Apply all migrations from scratch
+        run: npx supabase db reset
+      - name: Lint database schema
+        run: npx supabase db lint --level warning
+      - name: Stop local Supabase
+        if: always()
+        run: npx supabase stop --no-backup

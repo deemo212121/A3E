@@ -1,0 +1,9 @@
+.next
+node_modules
+coverage
+package-lock.json
+next-env.d.ts
+supabase/.temp
+supabase/.branches
+docs
+AGENTS.md
