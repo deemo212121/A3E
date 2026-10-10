@@ -149,6 +149,9 @@ async function Entry({ params }: { params: Promise<{ clientId: string; entryId: 
                   debit: totalDebit,
                   credit: totalCredit,
                   description: null,
+                  counterparty_name: null,
+                  counterparty_tin: null,
+                  document_ref: null,
                 },
               ]}
               rowKey={(l) => String(l.line_no)}
@@ -159,6 +162,23 @@ async function Entry({ params }: { params: Promise<{ clientId: string; entryId: 
                     l.line_no === 0 ? <strong>Totals</strong> : `${l.code} · ${l.name}`,
                 },
                 { header: "Description", cell: (l) => l.description ?? "" },
+                {
+                  header: "Supplier / customer",
+                  cell: (l) =>
+                    l.counterparty_name ? (
+                      <>
+                        {l.counterparty_name}
+                        {l.counterparty_tin ? (
+                          <span className="block text-xs text-[var(--muted)] tabular-nums">
+                            TIN {l.counterparty_tin}
+                          </span>
+                        ) : null}
+                      </>
+                    ) : (
+                      ""
+                    ),
+                },
+                { header: "Receipt / invoice", kind: "nowrap", cell: (l) => l.document_ref ?? "" },
                 {
                   header: "Debit",
                   cell: (l) => formatAmount(l.debit === "0.00" ? "" : l.debit),
@@ -200,6 +220,9 @@ async function Entry({ params }: { params: Promise<{ clientId: string; entryId: 
                       debit: l.debit === "0.00" ? "" : l.debit,
                       credit: l.credit === "0.00" ? "" : l.credit,
                       description: l.description ?? "",
+                      counterparty_name: l.counterparty_name ?? "",
+                      counterparty_tin: l.counterparty_tin ?? "",
+                      document_ref: l.document_ref ?? "",
                     })),
                   }}
                 />

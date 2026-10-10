@@ -18,7 +18,26 @@ interface LineState {
   debit: string;
   credit: string;
   description: string;
+  counterparty_name: string;
+  counterparty_tin: string;
+  document_ref: string;
 }
+
+const EMPTY_LINE = {
+  account_id: "",
+  debit: "",
+  credit: "",
+  description: "",
+  counterparty_name: "",
+  counterparty_tin: "",
+  document_ref: "",
+};
+
+const hasDetails = (l: Omit<LineState, "key">) =>
+  Boolean(l.counterparty_name || l.counterparty_tin || l.document_ref);
+
+const INPUT =
+  "w-full rounded-md border border-[var(--border)] bg-[var(--surface-raised)] px-2 py-2";
 
 const cents = (v: string) => (v !== "" && isValidAmount(v) ? toCentavos(v) : 0n);
 
@@ -49,15 +68,14 @@ export function EntryForm({
   };
 }) {
   const [lines, setLines] = useState<LineState[]>(() =>
-    (initial?.lines.length
-      ? initial.lines
-      : [
-          { account_id: "", debit: "", credit: "", description: "" },
-          { account_id: "", debit: "", credit: "", description: "" },
-        ]
-    ).map((l, i) => ({ ...l, key: i })),
+    (initial?.lines.length ? initial.lines : [EMPTY_LINE, EMPTY_LINE]).map((l, i) => ({
+      ...l,
+      key: i,
+    })),
   );
   const [nextKey, setNextKey] = useState(lines.length);
+  const anyDetails = lines.some(hasDetails);
+  const [showDetails, setShowDetails] = useState(anyDetails);
 
   const totals = useMemo(() => {
     const debit = lines.reduce((s, l) => s + cents(l.debit), 0n);
@@ -69,11 +87,14 @@ export function EntryForm({
     setLines((ls) => ls.map((l) => (l.key === key ? { ...l, ...patch } : l)));
 
   const payload = JSON.stringify(
-    lines.map(({ account_id, debit, credit, description }) => ({
-      account_id,
-      debit,
-      credit,
-      description,
+    lines.map((l) => ({
+      account_id: l.account_id,
+      debit: l.debit,
+      credit: l.credit,
+      description: l.description,
+      counterparty_name: l.counterparty_name,
+      counterparty_tin: l.counterparty_tin,
+      document_ref: l.document_ref,
     })),
   );
 
@@ -123,6 +144,21 @@ export function EntryForm({
 
       <fieldset className="mt-2">
         <legend className="mb-2 text-sm font-medium">Lines</legend>
+        <label className="mb-3 flex items-start gap-2 text-sm">
+          <input
+            type="checkbox"
+            className="mt-0.5"
+            checked={showDetails || anyDetails}
+            disabled={anyDetails}
+            onChange={(e) => setShowDetails(e.target.checked)}
+          />
+          <span>
+            Record supplier/customer, TIN and receipt or invoice no. per line
+            <span className="block text-xs text-[var(--muted)]">
+              As in the cash disbursement and cash receipts books. Optional; frozen once posted.
+            </span>
+          </span>
+        </label>
         {/* Header row (desktop only); on phones each line is a labelled card. */}
         <div
           aria-hidden
@@ -145,7 +181,7 @@ export function EntryForm({
                 <select
                   value={l.account_id}
                   onChange={(e) => update(l.key, { account_id: e.target.value })}
-                  className="w-full rounded-md border border-[var(--border)] bg-[var(--surface-raised)] px-2 py-2"
+                  className={INPUT}
                 >
                   <option value="">Choose an account…</option>
                   {accounts.map((a) => (
@@ -175,9 +211,35 @@ export function EntryForm({
                 <input
                   value={l.description}
                   onChange={(e) => update(l.key, { description: e.target.value })}
-                  className="w-full rounded-md border border-[var(--border)] bg-[var(--surface-raised)] px-2 py-2"
+                  className={INPUT}
                 />
               </label>
+              {showDetails || anyDetails ? (
+                <div className="col-span-2 grid grid-cols-1 gap-2 rounded-md bg-[var(--surface)] p-2 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] md:order-last md:col-span-5">
+                  {(
+                    [
+                      ["counterparty_name", "Supplier / customer", "e.g. ABC Hardware Inc."],
+                      ["counterparty_tin", "TIN", "000-000-000-00000"],
+                      ["document_ref", "Receipt / invoice no.", "e.g. OR-1234, SI-0451"],
+                    ] as const
+                  ).map(([field, label, placeholder]) => (
+                    <label key={field} className="flex flex-col gap-1 text-xs">
+                      <span>
+                        {label}
+                        <span className="sr-only">, line {i + 1}</span>
+                      </span>
+                      <input
+                        value={l[field]}
+                        placeholder={placeholder}
+                        inputMode={field === "counterparty_tin" ? "numeric" : undefined}
+                        maxLength={field === "counterparty_name" ? 200 : 100}
+                        onChange={(e) => update(l.key, { [field]: e.target.value })}
+                        className={INPUT}
+                      />
+                    </label>
+                  ))}
+                </div>
+              ) : null}
               <div className="col-span-2 flex justify-end md:col-span-1 md:items-center">
                 <button
                   type="button"
@@ -199,10 +261,7 @@ export function EntryForm({
           <button
             type="button"
             onClick={() => {
-              setLines((ls) => [
-                ...ls,
-                { key: nextKey, account_id: "", debit: "", credit: "", description: "" },
-              ]);
+              setLines((ls) => [...ls, { ...EMPTY_LINE, key: nextKey }]);
               setNextKey((k) => k + 1);
             }}
             className="rounded-md border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-1.5"

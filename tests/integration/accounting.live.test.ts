@@ -396,4 +396,57 @@ describe.skipIf(!enabled)("LIVE accounting engine on Supabase", () => {
     });
     expect(error?.code).toBe("42501");
   });
+
+  it("stores supplier, normalized TIN and receipt no. per line through the API (synthetic)", async () => {
+    const [fuel, cash] = await Promise.all([accountId("6040"), accountId("1020")]);
+    const supplier = { counterparty_name: "Sample Fuels Corp.", document_ref: "OR-1001" };
+    const { id } = await postEntry("2026-02-10", [], {
+      p_lines: [
+        {
+          account_id: fuel,
+          debit: "50.00",
+          credit: "",
+          ...supplier,
+          counterparty_tin: "111 222 333 00000",
+        },
+        { account_id: cash, debit: "", credit: "50.00" },
+      ],
+    });
+    const { data } = await sb.approver
+      .from("journal_lines")
+      .select("line_no, counterparty_name, counterparty_tin, document_ref")
+      .eq("entry_id", id)
+      .order("line_no");
+    expect(data).toEqual([
+      { line_no: 1, ...supplier, counterparty_tin: "111-222-333-00000" },
+      { line_no: 2, counterparty_name: null, counterparty_tin: null, document_ref: null },
+    ]);
+    const gl = await rpc<{ document_ref: string; counterparty_tin: string }[]>(
+      "approver",
+      "general_ledger",
+      { p_client_id: ids.A, p_account_id: fuel, p_from: "2026-02-10", p_to: "2026-02-10" },
+    );
+    expect(gl.map((r) => [r.document_ref, r.counterparty_tin])).toEqual([
+      ["OR-1001", "111-222-333-00000"],
+    ]);
+    await expect(
+      draft("2026-02-10", [], {
+        p_lines: [
+          {
+            account_id: fuel,
+            debit: "1.00",
+            credit: "",
+            counterparty_name: "X",
+            counterparty_tin: "12345",
+          },
+          { account_id: cash, debit: "", credit: "1.00" },
+        ],
+      }),
+    ).rejects.toMatchObject({ code: "22023" });
+    const other = await sb.ownerB
+      .from("journal_lines")
+      .select("counterparty_tin")
+      .eq("entry_id", id);
+    expect(other.data).toEqual([]);
+  });
 });

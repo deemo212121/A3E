@@ -160,7 +160,7 @@ beforeAll(async () => {
 
 // ---------------------------------------------------------------------------
 describe("setup", () => {
-  it("applies the 37-account template and 12 monthly periods", async () => {
+  it("applies the 57-account template and 12 monthly periods", async () => {
     const accounts = await db.query<{ n: number }>(
       "select count(*)::int as n from public.accounts where client_id = $1",
       [A],
@@ -169,7 +169,7 @@ describe("setup", () => {
       "select start_date::text, end_date::text from public.accounting_periods where client_id = $1 order by period_no",
       [A],
     );
-    expect(accounts.rows[0].n).toBe(37);
+    expect(accounts.rows[0].n).toBe(57);
     expect(periods.rows.length).toBe(12);
     expect(periods.rows[0]).toEqual({ start_date: "2026-01-01", end_date: "2026-01-31" });
     expect(periods.rows[1]).toEqual({ start_date: "2026-02-01", end_date: "2026-02-28" });

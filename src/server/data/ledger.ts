@@ -137,6 +137,9 @@ export interface EntryDetail {
     debit: string;
     credit: string;
     description: string | null;
+    counterparty_name: string | null;
+    counterparty_tin: string | null;
+    document_ref: string | null;
   }[];
 }
 
@@ -146,7 +149,7 @@ export async function getEntry(clientId: string, entryId: string): Promise<Entry
   const { data, error } = await supabase
     .from("journal_entries")
     .select(
-      "id, client_id, entry_no, entry_date, entry_type, status, memo, source_type, source_ref, review_comment, void_reason, prepared_by, approved_by, posted_at, reverses_entry_id, reversed_by_entry_id, journal_lines(line_no, account_id, debit::text, credit::text, description, accounts!journal_lines_client_id_account_id_fkey(code, name))",
+      "id, client_id, entry_no, entry_date, entry_type, status, memo, source_type, source_ref, review_comment, void_reason, prepared_by, approved_by, posted_at, reverses_entry_id, reversed_by_entry_id, journal_lines(line_no, account_id, debit::text, credit::text, description, counterparty_name, counterparty_tin, document_ref, accounts!journal_lines_client_id_account_id_fkey(code, name))",
     )
     .eq("id", entryId)
     .eq("client_id", clientId)
@@ -159,6 +162,9 @@ export async function getEntry(clientId: string, entryId: string): Promise<Entry
     debit: string;
     credit: string;
     description: string | null;
+    counterparty_name: string | null;
+    counterparty_tin: string | null;
+    document_ref: string | null;
     accounts: { code: string; name: string } | { code: string; name: string }[] | null;
   };
   const lines = ((data.journal_lines ?? []) as RawLine[])
@@ -172,6 +178,9 @@ export async function getEntry(clientId: string, entryId: string): Promise<Entry
         debit: l.debit,
         credit: l.credit,
         description: l.description,
+        counterparty_name: l.counterparty_name,
+        counterparty_tin: l.counterparty_tin,
+        document_ref: l.document_ref,
       };
     })
     .sort((x, y) => x.line_no - y.line_no);
@@ -209,6 +218,9 @@ export interface LedgerRow {
   memo: string;
   line_no: number;
   description: string | null;
+  counterparty_name: string | null;
+  counterparty_tin: string | null;
+  document_ref: string | null;
   debit: string;
   credit: string;
   running_balance: string;

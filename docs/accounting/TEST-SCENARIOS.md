@@ -48,6 +48,58 @@ Accounts are from the **PROPOSED** starter chart (`PH-SME-V0`, see [COA-TEMPLATE
 
 **Expected as of 2026-02-28:** Supplies Expense **100.00**; Cash in Bank **444,900.00**. The error nets to zero, and debits still equal credits.
 
+## Scenario S3: one month of a VAT-registered trading client (in the Firm's format)
+
+Added 2026-10-10 after reviewing one client's workbooks (see [FIRM-WORKBOOK-REVIEW.md](FIRM-WORKBOOK-REVIEW.md)). It records a month the way their books do: cash disbursements, cash receipts, semi-monthly payroll and an imprest petty cash fund. **All names, TINs and amounts are invented.** The 12% split (amount ÷ 1.12) copies the Firm's spreadsheet practice, and the payroll deductions are **illustrative, not contribution tables**. The platform computes **no** tax: every amount is typed by the preparer. Test: `tests/db/business-month.test.ts`.
+
+| Date | Entry | Debit | Credit |
+|---|---|---|---|
+| 09-01 | Opening capital | Cash in Bank 500,000.00 | Capital 500,000.00 |
+| 09-01 | Establish petty cash fund (CV-0001) | Petty Cash Fund 40,000.00 | Cash in Bank 40,000.00 |
+| 09-03 | Fuel, VAT supplier (OR-1001, TIN 111-222-333-00000) | Fuel and Oil 2,000.00; Input Tax 240.00 | Cash in Bank 2,240.00 |
+| 09-05 | Spare parts, non-VAT supplier (SI-2001) | Repairs and Maintenance 600.00 | Cash in Bank 600.00 |
+| 09-08 | Raw materials (SI-3001) | Purchases 100,000.00; Input Tax 12,000.00 | Cash in Bank 112,000.00 |
+| 09-10 | Customer collection (SI-0451) | Cash in Bank 336,000.00 | Sales 300,000.00; Output Tax 36,000.00 |
+| 09-12 | Cash advance to an employee | Advances to Employees 1,000.00 | Cash in Bank 1,000.00 |
+| 09-15 | Payroll 1–15 (no deductions in this half, as in the Firm's books) | Salaries 30,000.00 | Cash in Bank 30,000.00 |
+| 09-20 | Petty cash replenishment | Meals 1,250.00; Supplies 860.50; Repairs 2,349.75; Employee Benefits 1,000.00 | Cash in Bank 5,460.25 |
+| 09-22 | **Error:** fuel entered twice (OR-1002) | Fuel and Oil 1,000.00; Input Tax 120.00 | Cash in Bank 1,120.00 |
+| 09-25 | **Reversal** of the 09-22 entry; the reversal lines keep the supplier, TIN and OR number | Cash in Bank 1,120.00 | Fuel and Oil 1,000.00; Input Tax 120.00 |
+| 09-30 | Payroll 16–30. Employee shares: SSS 950, PhilHealth 600, Pag-IBIG 200; SSS loan 500; cash advance 1,000. Employer shares: SSS 1,900, PhilHealth 600, Pag-IBIG 200 | Salaries 30,000.00; Employer Contributions 2,700.00 | SSS Payable 2,850.00; PhilHealth Payable 1,200.00; Pag-IBIG Payable 400.00; SSS Loans Payable 500.00; Advances to Employees 1,000.00; Cash in Bank (net pay) 26,750.00 |
+| 09-30 | Remit PhilHealth and Pag-IBIG | PhilHealth Payable 1,200.00; Pag-IBIG Payable 400.00 | Cash in Bank 1,600.00 |
+
+**Expected trial balance as of 2026-09-30:**
+
+| Account | Balance |
+|---|---|
+| 1015 Petty Cash Fund | 40,000.00 (unchanged by replenishment) |
+| 1020 Cash in Bank | 616,349.75 |
+| 1120 Advances to Employees | 0.00 |
+| 1310 Input Tax | 12,240.00 |
+| 5020 Purchases | 100,000.00 |
+| 6010 Salaries and Wages | 60,000.00 |
+| 6012 Employer Contributions | 2,700.00 |
+| 6014 Employee Benefits | 1,000.00 |
+| 6040 Supplies Expense | 860.50 |
+| 6080 Repairs and Maintenance | 2,949.75 |
+| 6090 Fuel and Oil | 2,000.00 (the duplicate nets to zero) |
+| 6130 Meals Expense | 1,250.00 |
+| **Debit-balance total** | **839,350.00** |
+| 2100 Output Tax | 36,000.00 |
+| 2120 SSS Contributions Payable | 2,850.00 (not yet remitted) |
+| 2130 PhilHealth / 2140 Pag-IBIG Payable | 0.00 / 0.00 |
+| 2150 SSS Loans Payable | 500.00 |
+| 3010 Capital | 500,000.00 |
+| 4010 Sales | 300,000.00 |
+| **Credit-balance total** | **839,350.00** |
+
+Also tested:
+- TINs typed as `123456789`, `123 456 789 001` or `123-456-789-00000` are stored in dashed form.
+- Malformed TINs are rejected, as is a TIN without a name.
+- The supplier, TIN and receipt fields cannot be changed once posted, even by the database owner.
+- The fields are invisible to users of other clients.
+- The general ledger lists the receipt number and supplier for each line.
+
 ## Controls verified (expected behaviour)
 
 | # | Control | Expected |
@@ -78,6 +130,7 @@ Accounts are from the **PROPOSED** starter chart (`PH-SME-V0`, see [COA-TEMPLATE
 | Who maintains the chart of accounts | Manager, reviewer, accountant (assigned). Bookkeepers cannot. | ☐ |
 | Who opens fiscal years / closes periods | Reviewer or manager. **Locking:** manager only. | ☐ |
 | Rounding | No rounding anywhere: amounts must have at most 2 decimals | ☐ |
+| S3 recording pattern | Is S3 how the Firm wants these transactions booked? Specifically: purchases expensed to "Purchases" vs inventory; petty cash as an imprest fund; payroll liabilities by agency; employee loans as payables | ☐ |
 
 ## Sign-off
 

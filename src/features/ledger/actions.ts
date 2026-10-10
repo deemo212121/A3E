@@ -20,6 +20,8 @@ import { fromDbError } from "@/server/db/errors";
 type Result = ActionResult<string>;
 
 const AMOUNT = /^\d{1,16}(\.\d{1,2})?$/;
+// Format sanity check only (9-digit TIN + optional 3-5 digit branch code); the DB normalizes.
+const TIN = /^\d{9}(\d{3,5})?$/;
 
 function requireStaffOn(access: Access, clientId: string, roles: readonly string[] = STAFF_ROLES) {
   if (
@@ -162,8 +164,22 @@ const lineSchema = z
       .string()
       .refine((v) => v === "" || AMOUNT.test(v), "Use digits with up to 2 decimals"),
     description: z.string().max(300).optional(),
+    counterparty_name: z.string().trim().max(200).optional(),
+    counterparty_tin: z
+      .string()
+      .trim()
+      .refine(
+        (v) => v === "" || TIN.test(v.replace(/[\s-]/g, "")),
+        "TIN: 9 digits plus an optional 3-5 digit branch code",
+      )
+      .optional(),
+    document_ref: z.string().trim().max(100).optional(),
   })
-  .refine((l) => (l.debit === "") !== (l.credit === ""), "Each line needs a debit OR a credit");
+  .refine((l) => (l.debit === "") !== (l.credit === ""), "Each line needs a debit OR a credit")
+  .refine(
+    (l) => !l.counterparty_tin || Boolean(l.counterparty_name),
+    "Enter the supplier/customer name for every TIN",
+  );
 
 const draftSchema = clientOnly.extend({
   entryId: z.union([z.literal(""), z.uuid()]).optional(),
@@ -210,7 +226,13 @@ export async function saveDraftAction(_p: Result | null, fd: FormData): Promise<
       p_source_type: i.sourceType || null,
       p_source_ref: i.sourceRef || null,
       p_idempotency_key: i.idempotencyKey,
-      p_lines: i.lines.map((l) => ({ ...l, description: l.description ?? "" })),
+      p_lines: i.lines.map((l) => ({
+        ...l,
+        description: l.description ?? "",
+        counterparty_name: l.counterparty_name ?? "",
+        counterparty_tin: l.counterparty_tin ?? "",
+        document_ref: l.document_ref ?? "",
+      })),
     })) as string;
     redirect(pathFor("staff.entry", { clientId: i.clientId, entryId: id }));
   });

@@ -26,7 +26,7 @@
 | — | [Phase 3 report](PHASE-3-REPORT.md) | Auth, tenancy and isolation: live cross-tenant results |
 | — | [Phase 4 report](PHASE-4-REPORT.md) | Shell and navigation: live route-access results |
 | — | [Phase 5 report](PHASE-5-REPORT.md) | Double-entry engine: accounting, concurrency and duplicate-prevention results |
-| accounting | [Test scenarios (for accountant sign-off)](accounting/TEST-SCENARIOS.md) · [Starter chart of accounts (PROPOSED)](accounting/COA-TEMPLATE-PROPOSED.md) | Phase 5 |
+| accounting | [Test scenarios (for accountant sign-off)](accounting/TEST-SCENARIOS.md) · [Starter chart of accounts (PROPOSED)](accounting/COA-TEMPLATE-PROPOSED.md) · [Review of the Firm's client workbooks](accounting/FIRM-WORKBOOK-REVIEW.md) | Phase 5 |
 | design | [Design system](design/DESIGN-SYSTEM.md) · [Information architecture and route access](design/INFORMATION-ARCHITECTURE.md) | Phase 4 (PROPOSED) |
 | security | [Access control](security/ACCESS-CONTROL.md) · [Runbook: recovery and disable](runbooks/ACCOUNT-RECOVERY-AND-DISABLE.md) · [Supabase project setup](setup/SUPABASE-AUTH-SETUP.md) | Phase 3 security docs |
 | setup | [Local development](setup/LOCAL-DEVELOPMENT.md) · [Environments](setup/ENVIRONMENTS.md) · [Migrations](setup/MIGRATIONS.md) · [Project structure](setup/PROJECT-STRUCTURE.md) · [Troubleshooting](setup/TROUBLESHOOTING.md) | Developer setup |

@@ -75,6 +75,23 @@
 | Multi-currency | Not supported (PHP only, as assumed in doc 12) |
 | Browser click-through tests of the entry form | Not added. Server, database and HTTP layers are tested. |
 
+## 5a. Addendum (2026-10-10): aligning with the Firm's real books
+
+Done at the owner's request after reviewing one client's workbooks ([accounting/FIRM-WORKBOOK-REVIEW.md](accounting/FIRM-WORKBOOK-REVIEW.md)). **No tax computation was added.**
+
+| Change | Where |
+|---|---|
+| 20 accounts added to the PROPOSED starter chart (now 57): petty cash fund, advances to employees, raw materials, payroll liabilities by agency, employee loans payable, VAT payable placeholder, purchases, employer contributions, benefits, repairs, fuel, transportation, communication, taxes and licenses, meals, representation | Migration `20261010150100`; [COA-TEMPLATE-PROPOSED.md](accounting/COA-TEMPLATE-PROPOSED.md) |
+| Optional **supplier/customer name, TIN and receipt/invoice no.** on each journal line. The TIN is format-checked (9 digits + optional 3–5 digit branch code) and stored in dashed form. A TIN requires a name. The fields freeze on posting (existing line guard), are copied into reversals, and are returned by `general_ledger`. | Migration `20261010150000`; entry form (optional per-line details), entry page, ledger page |
+| **Scenario S3**: one synthetic month in the Firm's format (CDJ, CRJ, two payrolls, petty cash, a reversed duplicate) with a hard-coded trial balance | `tests/db/business-month.test.ts`; [TEST-SCENARIOS.md](accounting/TEST-SCENARIOS.md) |
+
+**Tests run 2026-10-10:**
+- `npm run check` passes: 15 files, **217 tests** (S3 adds 10).
+- Live accounting suite **10/10** on real Supabase; the new test round-trips the fields through the API, checks TIN normalization and rejection, and checks that the fields are invisible to another client.
+- Live integration **42/42**; live routes **24/24**.
+- Mutation check: removing the field copy from `reverse_entry` makes 2 S3 tests fail.
+- Both migrations are applied to the dev project; `supabase db lint` reports no errors. The dev DB is clean (DEMO-A and DEMO-B only; 0 temporary users).
+
 ## 6. Acceptance criteria
 
 - [x] Every posted journal entry balances: function checks **and** a commit-time constraint, proven against superuser SQL
@@ -86,5 +103,5 @@
 - [x] Append-only audit events
 - [x] Deterministic automated accounting tests with hard-coded expected results
 - [x] No tax computations
-- [ ] **Accountant review of the expected results, the chart of accounts and D-08/D-10**
+- [ ] **Accountant review of the expected results (S1–S3), the chart of accounts and D-08/D-10**, plus the 7 workbook questions in FIRM-WORKBOOK-REVIEW.md §3
 - [ ] Owner approval of this report

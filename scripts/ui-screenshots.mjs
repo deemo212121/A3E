@@ -148,6 +148,13 @@ try {
         );
         await page.screenshot({ path: file, fullPage: true });
         console.log(file);
+        // Journal page: also capture the entry form with the per-line supplier/receipt fields open.
+        const details = page.getByLabel(/Record supplier\/customer/);
+        if (path.endsWith("/journal") && (await details.count()) > 0) {
+          await details.check();
+          const form = page.locator("#new-entry");
+          await form.screenshot({ path: file.replace(/\.png$/, "_form-details.png") });
+        }
       }
       await ctx.close();
     }

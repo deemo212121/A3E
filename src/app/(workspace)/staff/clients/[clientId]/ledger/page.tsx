@@ -95,6 +95,16 @@ async function Ledger({ params, searchParams }: Props) {
                   },
                   { header: "Memo", cell: (r) => r.description || r.memo },
                   {
+                    header: "Supplier / customer",
+                    hideOnMobile: true,
+                    cell: (r) => r.counterparty_name ?? "",
+                  },
+                  {
+                    header: "Receipt / invoice",
+                    kind: "nowrap",
+                    cell: (r) => r.document_ref ?? "",
+                  },
+                  {
                     header: "Debit",
                     cell: (r) => (r.debit === "0.00" ? "" : formatAmount(r.debit)),
                     kind: "num",
