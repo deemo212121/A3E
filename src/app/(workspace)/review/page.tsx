@@ -8,6 +8,9 @@ import { Badge, PageHeader, PageSkeleton, Section } from "@/components/ui/primit
 import { pathFor } from "@/lib/access/route-policy";
 import { formatAmount } from "@/lib/money/amount";
 import { guardRoute } from "@/server/auth/route-guard";
+import { StatusBadge } from "@/features/intake/components/intake-ui";
+import { labelOf, TXN_KINDS } from "@/lib/intake/rules";
+import { listIntakeQueue } from "@/server/data/intake";
 import { listReviewQueue } from "@/server/data/ledger";
 import { listVisibleClients } from "@/server/data/workspace";
 
@@ -24,7 +27,11 @@ export default function ReviewPage() {
 async function Review() {
   const { access, facts, decision } = await guardRoute("review");
   if (!decision.allowed) return <DeniedState reason={decision.reason} />;
-  const [clients, queue] = await Promise.all([listVisibleClients(), listReviewQueue()]);
+  const [clients, queue, intake] = await Promise.all([
+    listVisibleClients(),
+    listReviewQueue(),
+    listIntakeQueue(["submitted", "reviewed"]),
+  ]);
   const scoped = clients.filter((c) => facts.staffClientIds.includes(c.id));
   const clientName = new Map(clients.map((c) => [c.id, c.display_name]));
 
@@ -65,6 +72,45 @@ async function Review() {
         />
         <p className="mt-2 text-xs text-[var(--muted)]">
           You cannot approve entries you prepared ({access.email}); another reviewer must.
+        </p>
+      </Section>
+      <Section title="Client submissions (intake)">
+        <DataTable
+          caption="Intake transactions waiting for review or approval"
+          rows={intake}
+          rowKey={(t) => t.id}
+          empty="No client submissions are waiting."
+          columns={[
+            { header: "Client", cell: (t) => clientName.get(t.client_id) ?? "—" },
+            { header: "Date", kind: "nowrap", cell: (t) => t.txn_date ?? "—" },
+            {
+              header: "Transaction",
+              cell: (t) => (
+                <Link
+                  className="underline"
+                  href={pathFor("staff.intake_txn", { clientId: t.client_id, itemId: t.id })}
+                >
+                  {labelOf(TXN_KINDS, t.kind)}
+                  {t.document_ref ? ` ${t.document_ref}` : ""}
+                </Link>
+              ),
+            },
+            {
+              header: "Customer / supplier",
+              hideOnMobile: true,
+              cell: (t) => t.counterparty_name ?? "",
+            },
+            {
+              header: "Amount",
+              kind: "num",
+              cell: (t) => (t.gross_amount ? formatAmount(t.gross_amount) : ""),
+            },
+            { header: "Status", cell: (t) => <StatusBadge status={t.status} /> },
+          ]}
+        />
+        <p className="mt-2 text-xs text-[var(--muted)]">
+          &quot;Submitted&quot; needs a check by a preparer; &quot;Reviewed&quot; needs approval by
+          a different reviewer.
         </p>
       </Section>
       <Section title="Clients in your review scope">

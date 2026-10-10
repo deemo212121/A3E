@@ -12,7 +12,7 @@ Tick each box as you go. If something does not match, write down what you saw.
 ## A. Bookkeeping: sign in as `demo.accountant@example.com` (authenticator already set up)
 
 1. ☐ You land on **My clients**. Only **DEMO Sampaguita Trading** is listed (the accountant is assigned to that one client only).
-2. ☐ Click it. You see tabs: **Overview · Journal · Trial balance · General ledger · Chart of accounts · Periods**.
+2. ☐ Click it. You see tabs: **Overview · Intake · Imports · Journal · Trial balance · General ledger · Chart of accounts · Periods**.
 3. ☐ **Chart of accounts:** a list of accounts (1010 Cash on Hand … 6900 Miscellaneous). Headers such as "Assets" are bold.
 4. ☐ **Periods:** fiscal year 2026 with 12 months, all "open".
 5. ☐ **Journal:** entries **JE 1 to JE 10**, plus two unnumbered ones:
@@ -54,6 +54,24 @@ Tick each box as you go. If something does not match, write down what you saw.
 17. ☐ As **demo.owner** (client portal), paste a staff URL such as `/staff/clients/<id>/journal` into the address bar. You get **"You don't have access"**.
 18. ☐ As **demo.accountant**, open **DEMO Narra Services Corp.** by URL (copy its id from the admin client list). You get **"Page not found"**, because the accountant isn't assigned to it.
 
+## D. Client sends records (Phase 6): sign in as `demo.owner@example.com`
+
+19. ☐ The **Overview** shows cards (Drafts, With the firm, Approved or posted, Documents) and buttons to record, upload and import.
+20. ☐ **Transactions → + New transaction.** Choose **Sale**, enter only a total, click **Save and submit for review**. ☐ It is refused: "Required for sales and purchases" appears under the invoice number. Nothing is saved.
+21. ☐ Fill in an invoice number, a customer name and a total, then **double-click** "Save and submit for review". ☐ You land on the transaction with status **Submitted**. ☐ The Transactions list shows it **once**.
+22. ☐ Record the **same invoice number for the same customer** again. ☐ It is refused as a **duplicate**.
+23. ☐ **Documents:** upload a PDF or a phone photo. ☐ It shows "✓ Uploaded" and can be downloaded. Upload the same file again. ☐ It is refused ("already uploaded"). Rename a non-document file (e.g. a .exe) to .pdf and upload it. ☐ It is refused.
+24. ☐ **Imports:** upload `tests/fixtures/synthetic-books.xlsx`. Choose **Purchase** as the type and click **Check all rows**. ☐ Rows 5–7 are **Ready** and row 9 (TOTAL) is an **Error**, with the Excel row numbers. Click **Import 3 ready rows**. ☐ The summary says 3 imported.
+25. ☐ **Customers & suppliers:** add a supplier with a TIN. ☐ Adding another supplier with the same TIN is refused.
+26. ☐ **Business profile:** fill in the form and **Save and submit**. ☐ The status shows **Submitted**.
+
+## E. Firm reviews (Phase 6): `demo.accountant`, then `demo.manager`
+
+27. ☐ As the accountant, open **DEMO Sampaguita Trading → Intake**. The submitted transactions are listed. Open one and click **Mark as reviewed**. ☐ There is **no Approve button**; it says another reviewer must approve.
+28. ☐ Open another one, expand **Return to the client for correction**, write a comment and send it. ☐ As demo.owner, the overview now says "need your correction" and the comment is shown on the transaction.
+29. ☐ As the manager, open the reviewed transaction and click **Approve**. ☐ The status is **Approved**. Then, as the **accountant**, open it again: a **Book in the journal** form appears, already filled with the amount, supplier and receipt number. Choose the accounts, create the draft and submit it. As the **manager**, approve and post that journal entry. ☐ The transaction now shows **Posted**.
+30. ☐ The **Review queue** also lists client submissions waiting for review or approval.
+
 ---
 
 ## For the accounting firm's CPA (the review that matters)
@@ -62,4 +80,4 @@ Please check and sign:
 - **[accounting/TEST-SCENARIOS.md](accounting/TEST-SCENARIOS.md):** are the sample entries and expected results correct? Do you agree with the policy choices (corrections, numbering, who can approve)?
 - **[accounting/COA-TEMPLATE-PROPOSED.md](accounting/COA-TEMPLATE-PROPOSED.md):** is this chart of accounts acceptable, or what should change?
 
-**Not built yet (so don't look for it):** document uploads, financial statements, BIR forms or tax computations, and a client-side view of the books.
+**Not built yet (so don't look for it):** VAT/withholding computation and tax tagging, purchase/sales registers, payroll computation, financial statements, BIR forms, requests for information, email notifications, and a client-side view of the books.

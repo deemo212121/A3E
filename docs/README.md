@@ -26,6 +26,8 @@
 | — | [Phase 3 report](PHASE-3-REPORT.md) | Auth, tenancy and isolation: live cross-tenant results |
 | — | [Phase 4 report](PHASE-4-REPORT.md) | Shell and navigation: live route-access results |
 | — | [Phase 5 report](PHASE-5-REPORT.md) | Double-entry engine: accounting, concurrency and duplicate-prevention results |
+| — | [Phase 6 report](PHASE-6-REPORT.md) | Client portal and data intake: retry-safety gate, uploads, imports, live and browser test results |
+| intake | [Canonical intake schema](intake/CANONICAL-INTAKE-SCHEMA.md) | Transactions, customers/suppliers, documents, imports, workflow and retry rules (Phase 6) |
 | accounting | [Test scenarios (for accountant sign-off)](accounting/TEST-SCENARIOS.md) · [Starter chart of accounts (PROPOSED)](accounting/COA-TEMPLATE-PROPOSED.md) · [Review of the Firm's client workbooks](accounting/FIRM-WORKBOOK-REVIEW.md) | Phase 5 |
 | design | [Design system](design/DESIGN-SYSTEM.md) · [Information architecture and route access](design/INFORMATION-ARCHITECTURE.md) | Phase 4 (PROPOSED) |
 | security | [Access control](security/ACCESS-CONTROL.md) · [Runbook: recovery and disable](runbooks/ACCOUNT-RECOVERY-AND-DISABLE.md) · [Supabase project setup](setup/SUPABASE-AUTH-SETUP.md) | Phase 3 security docs |

@@ -48,6 +48,13 @@ const EXPECTED: Record<string, RouteKey[]> = {
     "portal.team",
     "portal.documents",
     "portal.requests",
+    "portal.transactions",
+    "portal.transaction_new",
+    "portal.transaction",
+    "portal.counterparties",
+    "portal.profile",
+    "portal.imports",
+    "portal.import",
   ],
   staffA: [
     "home",
@@ -59,6 +66,13 @@ const EXPECTED: Record<string, RouteKey[]> = {
     "portal.team",
     "portal.documents",
     "portal.requests",
+    "portal.transactions",
+    "portal.transaction_new",
+    "portal.transaction",
+    "portal.counterparties",
+    "portal.profile",
+    "portal.imports",
+    "portal.import",
   ],
   viewerA: [
     "home",
@@ -70,6 +84,12 @@ const EXPECTED: Record<string, RouteKey[]> = {
     "portal.team",
     "portal.documents",
     "portal.requests",
+    "portal.transactions",
+    "portal.transaction",
+    "portal.counterparties",
+    "portal.profile",
+    "portal.imports",
+    "portal.import",
   ],
   firmAdmin: [
     "home",
@@ -93,6 +113,10 @@ const EXPECTED: Record<string, RouteKey[]> = {
     "staff.entry",
     "staff.trial_balance",
     "staff.ledger",
+    "staff.intake",
+    "staff.intake_txn",
+    "staff.imports",
+    "staff.import",
     "review",
     "review.assignments",
     "admin",
@@ -112,6 +136,10 @@ const EXPECTED: Record<string, RouteKey[]> = {
     "staff.entry",
     "staff.trial_balance",
     "staff.ledger",
+    "staff.intake",
+    "staff.intake_txn",
+    "staff.imports",
+    "staff.import",
     "review",
   ],
   accountantB: ["home", "account", "invitations", "staff"],
@@ -128,6 +156,13 @@ const ALL_ROUTES: RouteKey[] = [
   "portal.team",
   "portal.documents",
   "portal.requests",
+  "portal.transactions",
+  "portal.transaction_new",
+  "portal.transaction",
+  "portal.counterparties",
+  "portal.profile",
+  "portal.imports",
+  "portal.import",
   "staff",
   "staff.client",
   "staff.accounts",
@@ -136,6 +171,10 @@ const ALL_ROUTES: RouteKey[] = [
   "staff.entry",
   "staff.trial_balance",
   "staff.ledger",
+  "staff.intake",
+  "staff.intake_txn",
+  "staff.imports",
+  "staff.import",
   "review",
   "review.assignments",
   "admin",
@@ -232,10 +271,10 @@ describe("matchRoute", () => {
   it("round-trips every route through pathFor", () => {
     const E = "eeeeeeee-0000-4000-8000-00000000000e";
     for (const r of ALL_ROUTES) {
-      const href = pathFor(r, { clientId: A, entryId: E });
+      const href = pathFor(r, { clientId: A, entryId: E, itemId: E });
       const params: Record<string, string> = {};
       if (href.includes(A)) params.clientId = A;
-      if (href.includes(E)) params.entryId = E;
+      if (href.includes(E)) params[r === "staff.entry" ? "entryId" : "itemId"] = E;
       expect(matchRoute(href)).toEqual({ route: r, params });
     }
   });
@@ -256,6 +295,26 @@ describe("matchRoute", () => {
         reason: "forbidden",
       });
     }
+  });
+
+  it("client viewers can read intake pages but not open the new-transaction form", () => {
+    expect(evaluateRoute("portal.transactions", PERSONAS.viewerA, { clientId: A }).allowed).toBe(
+      true,
+    );
+    expect(evaluateRoute("portal.transaction_new", PERSONAS.viewerA, { clientId: A })).toEqual({
+      allowed: false,
+      reason: "forbidden",
+    });
+    expect(evaluateRoute("portal.transaction_new", PERSONAS.ownerA, { clientId: B })).toEqual({
+      allowed: false,
+      reason: "not_found",
+    });
+  });
+
+  it("a non-UUID item id never matches (e.g. 'new' is its own route)", () => {
+    expect(matchRoute(`/portal/${A}/transactions/new`)?.route).toBe("portal.transaction_new");
+    expect(matchRoute(`/portal/${A}/transactions/xyz`)).toBeNull();
+    expect(matchRoute(`/staff/clients/${A}/imports/../journal`)).toBeNull();
   });
 
   it("rejects malformed ids and unknown paths", () => {

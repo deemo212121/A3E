@@ -13,7 +13,7 @@
  *   6. checks that denied pages leak no other tenant's data.
  * Everything created is deleted afterwards.
  */
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes, randomUUID } from "node:crypto";
 
 import { createServerClient } from "@supabase/ssr";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
@@ -176,7 +176,14 @@ function pathsToProbe(): string[] {
     `/portal/${id}/team`,
     `/portal/${id}/documents`,
     `/portal/${id}/requests`,
+    `/portal/${id}/transactions`,
+    `/portal/${id}/transactions/new`,
+    `/portal/${id}/counterparties`,
+    `/portal/${id}/profile`,
+    `/portal/${id}/imports`,
     `/staff/clients/${id}`,
+    `/staff/clients/${id}/intake`,
+    `/staff/clients/${id}/imports`,
     `/staff/clients/${id}/journal`,
     `/staff/clients/${id}/trial-balance`,
     `/staff/clients/${id}/ledger`,
@@ -298,6 +305,12 @@ describe.skipIf(!enabled)("LIVE route access: UI navigation matches actual permi
   afterAll(async () => {
     if (!admin) return;
     for (const id of [ids.A, ids.B].filter(Boolean)) {
+      const { data: docs } = await admin
+        .from("documents")
+        .select("storage_path")
+        .eq("client_id", id);
+      const paths = (docs ?? []).map((d) => d.storage_path as string);
+      if (paths.length) await admin.storage.from("client-documents").remove(paths);
       const { error } = await admin.rpc("purge_synthetic_client", { p_client_id: id });
       if (error) console.error(`purge failed: ${error.message}`);
     }
@@ -409,7 +422,10 @@ describe.skipIf(!enabled)("LIVE route access: UI navigation matches actual permi
       `/portal/${ids.B}`,
       `/portal/${ids.B}/team`,
       `/portal/${ids.B}/contacts`,
+      `/portal/${ids.B}/transactions`,
+      `/portal/${ids.B}/imports`,
       `/staff/clients/${ids.B}`,
+      `/staff/clients/${ids.B}/intake`,
     ]) {
       const body = (await get(path, cookies.ownerA)).body;
       expect({ path, leaked: body.includes(NAMES.B) }).toEqual({ path, leaked: false });
@@ -484,5 +500,113 @@ describe.skipIf(!enabled)("LIVE route access: UI navigation matches actual permi
     expect((await get(`${base}/trial-balance`, cookies.ownerB)).body.includes("123,456.78")).toBe(
       false,
     );
+  });
+
+  it("intake pages render real data by direct URL; downloads are tenant-checked", async () => {
+    const ownerA = clientsByKey.ownerA!;
+    const ok = <T>(r: { data: T; error: { message: string } | null }, what: string): T => {
+      if (r.error) throw new Error(`${what}: ${r.error.message}`);
+      return r.data;
+    };
+    const txnId = ok(
+      await ownerA.rpc("save_intake_transaction", {
+        p_client_id: ids.A,
+        p_transaction_id: null,
+        p_expected_version: null,
+        p_header: {
+          kind: "purchase",
+          txn_date: "2026-09-03",
+          document_ref: "RT-OR-1",
+          counterparty_name: "RT Sample Supplier",
+          gross_amount: "98765.43",
+        },
+        p_lines: [],
+        p_document_ids: null,
+        p_idempotency_key: `rt-txn-${run}`,
+      }),
+      "save transaction",
+    ) as string;
+    ok(
+      await ownerA.rpc("transition_intake_transaction", {
+        p_transaction_id: txnId,
+        p_to: "submitted",
+        p_comment: null,
+      }),
+      "submit",
+    );
+    const portalTxn = `/portal/${ids.A}/transactions/${txnId}`;
+    const staffTxn = `/staff/clients/${ids.A}/intake/${txnId}`;
+    const pages: [PersonaKey, string, string][] = [
+      ["ownerA", portalTxn, "allowed:portal.transaction"],
+      ["viewerA", portalTxn, "allowed:portal.transaction"],
+      ["reviewerA", staffTxn, "allowed:staff.intake_txn"],
+      ["reviewerA", `/staff/clients/${ids.A}/intake`, "allowed:staff.intake"],
+      ["ownerA", `/portal/${ids.A}/transactions`, "allowed:portal.transactions"],
+    ];
+    for (const [key, path, expected] of pages) {
+      const r = await get(path, cookies[key]);
+      expect({ key, path, outcome: classify(r) }).toEqual({ key, path, outcome: expected });
+      expect({ key, path, hasAmount: r.body.includes("98,765.43") }).toEqual({
+        key,
+        path,
+        hasAmount: true,
+      });
+    }
+    // Other tenant / unassigned staff: not found, and nothing leaks.
+    for (const [key, path] of [
+      ["ownerB", portalTxn],
+      ["accountantB", staffTxn],
+    ] as [PersonaKey, string][]) {
+      const r = await get(path, cookies[key]);
+      expect({ key, outcome: classify(r) }).toEqual({ key, outcome: "not_found" });
+      expect(r.body.includes("98,765.43")).toBe(false);
+    }
+    // A random (non-existent) transaction id is a not-found page, not an error.
+    expect(
+      classify(await get(`/portal/${ids.A}/transactions/${randomUUID()}`, cookies.ownerA)),
+    ).toBe("not_found");
+
+    // Upload a document the way the server does, then download through the route.
+    const bytes = new TextEncoder().encode(`%PDF-1.7
+% rt ${run}
+%%EOF
+`);
+    const begun = ok(
+      await ownerA.rpc("begin_document_upload", {
+        p_client_id: ids.A,
+        p_idempotency_key: `rt-doc-${run}`,
+        p_original_filename: "rt-receipt.pdf",
+        p_extension: "pdf",
+        p_mime_type: "application/pdf",
+        p_size_bytes: bytes.length,
+        p_sha256: createHash("sha256").update(bytes).digest("hex"),
+        p_category: "expense_receipt",
+        p_period_month: null,
+        p_description: null,
+      }),
+      "begin upload",
+    ) as { document_id: string; object_path: string }[];
+    const up = await admin.storage
+      .from("client-documents")
+      .upload(begun[0].object_path, bytes, { contentType: "application/pdf" });
+    if (up.error) throw new Error(`upload: ${up.error.message}`);
+    ok(
+      await ownerA.rpc("complete_document_upload", { p_document_id: begun[0].document_id }),
+      "complete",
+    );
+    const dl = `/api/documents/${begun[0].document_id}`;
+    const mine = await get(dl, cookies.ownerA);
+    expect(mine.status).toBe(303);
+    expect(mine.location).toContain("/storage/v1/object/sign/client-documents/");
+    const file = await fetch(mine.location);
+    expect(file.status).toBe(200);
+    expect(new Uint8Array(await file.arrayBuffer())).toEqual(bytes);
+    expect((await get(dl, cookies.viewerA)).status).toBe(303);
+    expect((await get(dl, cookies.reviewerA)).status).toBe(303);
+    for (const key of ["ownerB", "accountantB", "firmAdmin", "outsider"] as PersonaKey[]) {
+      expect({ key, status: (await get(dl, cookies[key])).status }).toEqual({ key, status: 404 });
+    }
+    expect((await get(dl)).status).toBe(401);
+    expect((await get("/api/documents/not-a-uuid", cookies.ownerA)).status).toBe(404);
   });
 });

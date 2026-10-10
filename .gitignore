@@ -61,3 +61,7 @@ Thumbs.db
 *.xlsm
 *.csv
 docs/input/
+
+# Synthetic test fixtures (made-up data) are allowed.
+!tests/fixtures/*.xlsx
+!tests/fixtures/*.csv

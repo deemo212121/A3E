@@ -14,6 +14,9 @@ const CODE_MAP: Record<string, ErrorCode> = {
   "22023": "VALIDATION",
   "23514": "VALIDATION", // check_violation
   "22P02": "VALIDATION", // invalid_text_representation (e.g. bad uuid)
+  "22007": "VALIDATION", // invalid_datetime_format
+  "22008": "VALIDATION", // datetime_field_overflow
+  "40001": "CONFLICT", // changed by someone else (optimistic concurrency); reload
   "23503": "VALIDATION", // foreign key violation
   PGRST116: "NOT_FOUND", // PostgREST: no rows for .single()
 };

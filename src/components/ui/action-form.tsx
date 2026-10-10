@@ -34,6 +34,8 @@ export function ActionForm<T>({
   confirmMessage,
   variant = "primary",
   toastOnSuccess = true,
+  buttons,
+  encType,
 }: {
   action: FormAction<T>;
   submitLabel: string;
@@ -42,6 +44,9 @@ export function ActionForm<T>({
   confirmMessage?: string;
   variant?: ButtonVariant;
   toastOnSuccess?: boolean;
+  /** Several submit buttons; the clicked one's name/value is sent with the form. */
+  buttons?: { label: string; name: string; value: string; variant?: ButtonVariant }[];
+  encType?: "multipart/form-data";
 }) {
   const [state, formAction, pending] = useActionState(action, null);
   const toast = useToast();
@@ -67,6 +72,7 @@ export function ActionForm<T>({
       <form
         ref={formRef}
         action={formAction}
+        encType={encType}
         className={className}
         aria-describedby={state && !state.ok ? summaryId : undefined}
         onSubmit={(event) => {
@@ -74,15 +80,31 @@ export function ActionForm<T>({
         }}
       >
         {children}
-        <div>
-          <button
-            type="submit"
-            disabled={pending}
-            aria-busy={pending}
-            className={BUTTON_VARIANTS[variant]}
-          >
-            {pending ? "Working…" : submitLabel}
-          </button>
+        <div className="flex flex-wrap gap-2">
+          {buttons ? (
+            buttons.map((b) => (
+              <button
+                key={b.value}
+                type="submit"
+                name={b.name}
+                value={b.value}
+                disabled={pending}
+                aria-busy={pending}
+                className={BUTTON_VARIANTS[b.variant ?? "secondary"]}
+              >
+                {pending ? "Working…" : b.label}
+              </button>
+            ))
+          ) : (
+            <button
+              type="submit"
+              disabled={pending}
+              aria-busy={pending}
+              className={BUTTON_VARIANTS[variant]}
+            >
+              {pending ? "Working…" : submitLabel}
+            </button>
+          )}
         </div>
         {state && !state.ok ? (
           <div
@@ -125,6 +147,9 @@ export function Field({
   defaultValue,
   hint,
   hideLabel,
+  placeholder,
+  inputMode,
+  maxLength,
 }: {
   label: string;
   name: string;
@@ -134,6 +159,9 @@ export function Field({
   defaultValue?: string;
   hint?: string;
   hideLabel?: boolean;
+  placeholder?: string;
+  inputMode?: "text" | "decimal" | "numeric" | "email" | "tel";
+  maxLength?: number;
 }) {
   const id = useId();
   const error = useFieldError(name);
@@ -159,6 +187,9 @@ export function Field({
         aria-required={required}
         autoComplete={autoComplete}
         defaultValue={defaultValue}
+        placeholder={placeholder}
+        inputMode={inputMode}
+        maxLength={maxLength}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy || undefined}
         className={INPUT_CLASS}
@@ -218,4 +249,72 @@ export function Select({
       ) : null}
     </div>
   );
+}
+
+export function TextArea({
+  label,
+  name,
+  defaultValue,
+  required,
+  rows = 3,
+  hint,
+  maxLength,
+}: {
+  label: string;
+  name: string;
+  defaultValue?: string;
+  required?: boolean;
+  rows?: number;
+  hint?: string;
+  maxLength?: number;
+}) {
+  const id = useId();
+  const error = useFieldError(name);
+  const describedBy = [hint ? `${id}-hint` : null, error ? `${id}-error` : null]
+    .filter(Boolean)
+    .join(" ");
+  return (
+    <div className="flex flex-col gap-1 text-sm">
+      <label htmlFor={id}>
+        {label}
+        {required ? (
+          <span aria-hidden className="text-[var(--danger)]">
+            {" "}
+            *
+          </span>
+        ) : null}
+      </label>
+      <textarea
+        id={id}
+        name={name}
+        rows={rows}
+        required={required}
+        maxLength={maxLength}
+        defaultValue={defaultValue}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy || undefined}
+        className={INPUT_CLASS}
+      />
+      {hint ? (
+        <p id={`${id}-hint`} className="text-xs text-[var(--muted)]">
+          {hint}
+        </p>
+      ) : null}
+      {error ? (
+        <p id={`${id}-error`} className="text-xs text-[var(--danger)]">
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/** Shows the form's error for a field that has no input of its own (e.g. "lines"). */
+export function FieldError({ name }: { name: string }) {
+  const error = useFieldError(name);
+  return error ? (
+    <p role="alert" className="text-xs text-[var(--danger)]">
+      {error}
+    </p>
+  ) : null;
 }

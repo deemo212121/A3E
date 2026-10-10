@@ -17,6 +17,13 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    // Uploads go through Server Actions, one file per request. Files are capped
+    // at 10 MB (src/lib/intake/files.ts); allow for multipart overhead. The
+    // proxy buffers request bodies, so its limit must match.
+    serverActions: { bodySizeLimit: "11mb" },
+    proxyClientMaxBodySize: "11mb",
+  },
   turbopack: {
     rules: {
       "*.css": {

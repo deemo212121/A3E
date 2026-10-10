@@ -55,6 +55,13 @@ export type RouteKey =
   | "portal.team"
   | "portal.documents"
   | "portal.requests"
+  | "portal.transactions"
+  | "portal.transaction_new"
+  | "portal.transaction"
+  | "portal.counterparties"
+  | "portal.profile"
+  | "portal.imports"
+  | "portal.import"
   | "staff"
   | "staff.client"
   | "staff.accounts"
@@ -63,6 +70,10 @@ export type RouteKey =
   | "staff.entry"
   | "staff.trial_balance"
   | "staff.ledger"
+  | "staff.intake"
+  | "staff.intake_txn"
+  | "staff.imports"
+  | "staff.import"
   | "review"
   | "review.assignments"
   | "admin"
@@ -75,6 +86,8 @@ export interface RouteParams {
   clientId?: string;
   /** Journal entry id (existence and ownership are checked under RLS by the page). */
   entryId?: string;
+  /** Intake transaction or import batch id (checked under RLS by the page). */
+  itemId?: string;
 }
 
 export type Decision = { allowed: true } | { allowed: false; reason: "forbidden" | "not_found" };
@@ -110,7 +123,19 @@ export function evaluateRoute(
     case "portal.team":
     case "portal.documents":
     case "portal.requests":
+    case "portal.transactions":
+    case "portal.transaction":
+    case "portal.counterparties":
+    case "portal.profile":
+    case "portal.imports":
+    case "portal.import":
       return membership(facts, params.clientId) ? ALLOW : NOT_FOUND;
+    case "portal.transaction_new": {
+      // Viewers may read but not record transactions.
+      const m = membership(facts, params.clientId);
+      if (!m) return NOT_FOUND;
+      return m.role === "client_viewer" ? FORBIDDEN : ALLOW;
+    }
 
     case "staff":
       return hasRole(facts, STAFF_ROLES) ? ALLOW : FORBIDDEN;
@@ -121,6 +146,10 @@ export function evaluateRoute(
     case "staff.entry":
     case "staff.trial_balance":
     case "staff.ledger":
+    case "staff.intake":
+    case "staff.intake_txn":
+    case "staff.imports":
+    case "staff.import":
       if (!hasRole(facts, STAFF_ROLES)) return FORBIDDEN;
       return params.clientId && facts.staffClientIds.includes(params.clientId) ? ALLOW : NOT_FOUND;
 
@@ -147,6 +176,7 @@ export function evaluateRoute(
 export function pathFor(route: RouteKey, params: RouteParams = {}): string {
   const id = params.clientId ?? ":clientId";
   const entry = params.entryId ?? ":entryId";
+  const item = params.itemId ?? ":itemId";
   switch (route) {
     case "home":
       return "/app";
@@ -166,6 +196,20 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return `/portal/${id}/documents`;
     case "portal.requests":
       return `/portal/${id}/requests`;
+    case "portal.transactions":
+      return `/portal/${id}/transactions`;
+    case "portal.transaction_new":
+      return `/portal/${id}/transactions/new`;
+    case "portal.transaction":
+      return `/portal/${id}/transactions/${item}`;
+    case "portal.counterparties":
+      return `/portal/${id}/counterparties`;
+    case "portal.profile":
+      return `/portal/${id}/profile`;
+    case "portal.imports":
+      return `/portal/${id}/imports`;
+    case "portal.import":
+      return `/portal/${id}/imports/${item}`;
     case "staff":
       return "/staff";
     case "staff.client":
@@ -182,6 +226,14 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return `/staff/clients/${id}/trial-balance`;
     case "staff.ledger":
       return `/staff/clients/${id}/ledger`;
+    case "staff.intake":
+      return `/staff/clients/${id}/intake`;
+    case "staff.intake_txn":
+      return `/staff/clients/${id}/intake/${item}`;
+    case "staff.imports":
+      return `/staff/clients/${id}/imports`;
+    case "staff.import":
+      return `/staff/clients/${id}/imports/${item}`;
     case "review":
       return "/review";
     case "review.assignments":
@@ -201,7 +253,8 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
 
 const UUID = "[0-9a-fA-F-]{36}";
 const STAFF_CLIENT = `^/staff/clients/(${UUID})`;
-const MATCHERS: [RegExp, RouteKey][] = [
+type Matcher = [RegExp, RouteKey, ("entryId" | "itemId")?];
+const MATCHERS: Matcher[] = [
   [/^\/app$/, "home"],
   [/^\/account$/, "account"],
   [/^\/invitations$/, "invitations"],
@@ -211,14 +264,25 @@ const MATCHERS: [RegExp, RouteKey][] = [
   [new RegExp(`^/portal/(${UUID})/team$`), "portal.team"],
   [new RegExp(`^/portal/(${UUID})/documents$`), "portal.documents"],
   [new RegExp(`^/portal/(${UUID})/requests$`), "portal.requests"],
+  [new RegExp(`^/portal/(${UUID})/transactions$`), "portal.transactions"],
+  [new RegExp(`^/portal/(${UUID})/transactions/new$`), "portal.transaction_new"],
+  [new RegExp(`^/portal/(${UUID})/transactions/(${UUID})$`), "portal.transaction", "itemId"],
+  [new RegExp(`^/portal/(${UUID})/counterparties$`), "portal.counterparties"],
+  [new RegExp(`^/portal/(${UUID})/profile$`), "portal.profile"],
+  [new RegExp(`^/portal/(${UUID})/imports$`), "portal.imports"],
+  [new RegExp(`^/portal/(${UUID})/imports/(${UUID})$`), "portal.import", "itemId"],
   [/^\/staff$/, "staff"],
   [new RegExp(`${STAFF_CLIENT}$`), "staff.client"],
   [new RegExp(`${STAFF_CLIENT}/accounts$`), "staff.accounts"],
   [new RegExp(`${STAFF_CLIENT}/periods$`), "staff.periods"],
   [new RegExp(`${STAFF_CLIENT}/journal$`), "staff.journal"],
-  [new RegExp(`${STAFF_CLIENT}/journal/(${UUID})$`), "staff.entry"],
+  [new RegExp(`${STAFF_CLIENT}/journal/(${UUID})$`), "staff.entry", "entryId"],
   [new RegExp(`${STAFF_CLIENT}/trial-balance$`), "staff.trial_balance"],
   [new RegExp(`${STAFF_CLIENT}/ledger$`), "staff.ledger"],
+  [new RegExp(`${STAFF_CLIENT}/intake$`), "staff.intake"],
+  [new RegExp(`${STAFF_CLIENT}/intake/(${UUID})$`), "staff.intake_txn", "itemId"],
+  [new RegExp(`${STAFF_CLIENT}/imports$`), "staff.imports"],
+  [new RegExp(`${STAFF_CLIENT}/imports/(${UUID})$`), "staff.import", "itemId"],
   [/^\/review$/, "review"],
   [/^\/review\/assignments$/, "review.assignments"],
   [/^\/admin$/, "admin"],
@@ -230,12 +294,12 @@ const MATCHERS: [RegExp, RouteKey][] = [
 
 /** Maps a pathname to its route (and params); null for unknown/public paths. */
 export function matchRoute(pathname: string): { route: RouteKey; params: RouteParams } | null {
-  for (const [re, route] of MATCHERS) {
+  for (const [re, route, second] of MATCHERS) {
     const m = re.exec(pathname);
     if (m) {
       const params: RouteParams = {};
       if (m[1]) params.clientId = m[1].toLowerCase();
-      if (m[2]) params.entryId = m[2].toLowerCase();
+      if (m[2] && second) params[second] = m[2].toLowerCase();
       return { route, params };
     }
   }
@@ -325,9 +389,13 @@ export function buildNavigation(facts: AccessFacts): NavSection[] {
 export function clientPortalTabs(facts: AccessFacts, clientId: string): NavItem[] {
   return [
     ...item(facts, "portal.client", "Overview", { clientId }),
+    ...item(facts, "portal.transactions", "Transactions", { clientId }),
+    ...item(facts, "portal.documents", "Documents", { clientId }),
+    ...item(facts, "portal.imports", "Imports", { clientId }),
+    ...item(facts, "portal.counterparties", "Customers & suppliers", { clientId }),
+    ...item(facts, "portal.profile", "Business profile", { clientId }),
     ...item(facts, "portal.contacts", "Contacts", { clientId }),
     ...item(facts, "portal.team", "Team", { clientId }),
-    ...item(facts, "portal.documents", "Documents", { clientId }),
     ...item(facts, "portal.requests", "Requests", { clientId }),
   ];
 }
@@ -336,6 +404,8 @@ export function clientPortalTabs(facts: AccessFacts, clientId: string): NavItem[
 export function staffClientTabs(facts: AccessFacts, clientId: string): NavItem[] {
   return [
     ...item(facts, "staff.client", "Overview", { clientId }),
+    ...item(facts, "staff.intake", "Intake", { clientId }),
+    ...item(facts, "staff.imports", "Imports", { clientId }),
     ...item(facts, "staff.journal", "Journal", { clientId }),
     ...item(facts, "staff.trial_balance", "Trial balance", { clientId }),
     ...item(facts, "staff.ledger", "General ledger", { clientId }),

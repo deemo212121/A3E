@@ -57,3 +57,16 @@ This implements the design in [doc 07](../07-security-and-tenant-isolation.md) a
 | `tests/integration/cross-tenant.api.test.ts` | The same attacks as **direct HTTP requests** to the live Supabase Data API with real user sessions, forged JWTs, anonymous requests and schema-switching headers | `npm run test:integration` |
 
 The offline suites run Postgres 18 (PGlite) with an emulation of Supabase's roles, `auth` schema and default grants. Supabase itself runs Postgres 17. The live suite covers the real platform.
+
+## 6. Phase 6 additions: intake and documents
+
+| Capability | Who (database function) |
+|---|---|
+| Create, edit, submit and cancel transactions, customers/suppliers and imports; upload documents | Client owner, client staff, assigned firm staff (`private.can_submit_intake`) |
+| Propose a business-profile change | Client owner; assigned manager, reviewer or accountant (`private.can_propose_profile`) |
+| Mark reviewed, request a correction, review documents, approve customers/suppliers | Assigned firm staff (`private.can_review_intake`) |
+| Approve or reject transactions and profile changes | Assigned reviewer or a manager (`private.can_approve_intake`), never the person who reviewed or submitted |
+| Read intake data and download documents | All members of the client (including viewers) and assigned staff. Internal staff notes are hidden from client users. |
+| Write to storage | **Nobody through the API.** The server writes bytes only to the path the user's authorized `begin_document_upload` returned, after verifying the file's real content. |
+
+All intake tables have RLS enabled and forced, and grant SELECT only. Every write goes through a SECURITY DEFINER function that re-checks the caller. Firm admins have no access to client business data (SoD-5). Verified by `tests/db/intake.test.ts`, `documents.test.ts`, `imports.test.ts` (offline), `tests/integration/intake.live.test.ts` (real Supabase and Storage) and the live route/e2e suites.

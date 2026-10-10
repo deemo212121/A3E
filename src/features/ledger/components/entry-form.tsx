@@ -52,6 +52,7 @@ export function EntryForm({
   idempotencyKey,
   defaultDate,
   initial,
+  prefill,
 }: {
   clientId: string;
   accounts: AccountOption[];
@@ -66,9 +67,18 @@ export function EntryForm({
     sourceRef: string;
     lines: Omit<LineState, "key">[];
   };
+  /** Defaults for a NEW entry (e.g. booking an approved intake transaction). */
+  prefill?: {
+    entryDate: string;
+    memo: string;
+    sourceType: string;
+    sourceRef: string;
+    lines: Omit<LineState, "key">[];
+  };
 }) {
+  const seed = initial ?? prefill;
   const [lines, setLines] = useState<LineState[]>(() =>
-    (initial?.lines.length ? initial.lines : [EMPTY_LINE, EMPTY_LINE]).map((l, i) => ({
+    (seed?.lines.length ? seed.lines : [EMPTY_LINE, EMPTY_LINE]).map((l, i) => ({
       ...l,
       key: i,
     })),
@@ -114,7 +124,7 @@ export function EntryForm({
           name="entryDate"
           type="date"
           required
-          defaultValue={initial?.entryDate ?? defaultDate}
+          defaultValue={seed?.entryDate ?? defaultDate}
         />
         <Select
           label="Entry type"
@@ -127,17 +137,17 @@ export function EntryForm({
             { value: "closing", label: "Closing" },
           ]}
         />
-        <Field label="Memo" name="memo" defaultValue={initial?.memo ?? ""} />
+        <Field label="Memo" name="memo" defaultValue={seed?.memo ?? ""} />
         <Field
           label="Source type (optional)"
           name="sourceType"
-          defaultValue={initial?.sourceType ?? ""}
+          defaultValue={seed?.sourceType ?? ""}
           hint="e.g. sales_invoice, official_receipt"
         />
         <Field
           label="Source reference (optional)"
           name="sourceRef"
-          defaultValue={initial?.sourceRef ?? ""}
+          defaultValue={seed?.sourceRef ?? ""}
           hint="e.g. SI-0001. A source can have only one live entry."
         />
       </div>
