@@ -3,6 +3,7 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 
 import { getPublicEnv } from "@/lib/env/public";
 
@@ -11,8 +12,14 @@ import { getPublicEnv } from "@/lib/env/public";
  *
  * Acts as the signed-in user (their session cookie), so Row Level Security
  * applies to every query. Create a new client per request; never share one.
+ *
+ * `connection()` first: per-user data must only load for a real request, never
+ * during prerendering (including runtime prefetch). It also keeps Supabase's
+ * session-expiry clock reads (Date.now) out of prerendering, which Next.js
+ * Cache Components rejects ("unstable value Date.now()").
  */
 export async function createSupabaseServerClient(): Promise<SupabaseClient> {
+  await connection();
   const env = getPublicEnv();
   const cookieStore = await cookies();
 
