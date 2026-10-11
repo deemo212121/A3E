@@ -30,6 +30,8 @@
 | — | [Phase 7 report](PHASE-7-REPORT.md) | Sales and receivables: invoice records, receipts, credit notes, posting rules, reconciliation |
 | — | [Phase 8 report](PHASE-8-REPORT.md) | Purchases, expenses and payables: bills, payments, withholding data, reconciliation |
 | purchases | [Posting rules](purchases/POSTING-RULES.md) | Purchase journal entries, signed-off withholding codes, categories (pending CPA review) |
+| — | [Phase 9 report](PHASE-9-REPORT.md) | Inventory and cost of goods sold: items, locations, movements, moving-average costing, reconciliation |
+| inventory | [Costing method](inventory/COSTING-METHOD.md) | Moving weighted average and stock posting rules (PENDING VERIFICATION) |
 | sales | [Posting rules](sales/POSTING-RULES.md) | Sales journal entries, rounding, controls (pending CPA review) |
 | intake | [Canonical intake schema](intake/CANONICAL-INTAKE-SCHEMA.md) | Transactions, customers/suppliers, documents, imports, workflow and retry rules (Phase 6) |
 | accounting | [Test scenarios (for accountant sign-off)](accounting/TEST-SCENARIOS.md) · [Starter chart of accounts (PROPOSED)](accounting/COA-TEMPLATE-PROPOSED.md) · [Review of the Firm's client workbooks](accounting/FIRM-WORKBOOK-REVIEW.md) | Phase 5 |

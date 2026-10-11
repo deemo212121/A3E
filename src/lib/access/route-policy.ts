@@ -84,6 +84,9 @@ export type RouteKey =
   | "staff.purchase_bill"
   | "staff.supplier_payment_new"
   | "staff.supplier_payment"
+  | "staff.inventory"
+  | "staff.inventory_movement_new"
+  | "staff.inventory_movement"
   | "review"
   | "review.assignments"
   | "admin"
@@ -170,6 +173,9 @@ export function evaluateRoute(
     case "staff.purchase_bill":
     case "staff.supplier_payment_new":
     case "staff.supplier_payment":
+    case "staff.inventory":
+    case "staff.inventory_movement_new":
+    case "staff.inventory_movement":
       if (!hasRole(facts, STAFF_ROLES)) return FORBIDDEN;
       return params.clientId && facts.staffClientIds.includes(params.clientId) ? ALLOW : NOT_FOUND;
 
@@ -274,6 +280,12 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return `/staff/clients/${id}/purchases/payments/new`;
     case "staff.supplier_payment":
       return `/staff/clients/${id}/purchases/payments/${item}`;
+    case "staff.inventory":
+      return `/staff/clients/${id}/inventory`;
+    case "staff.inventory_movement_new":
+      return `/staff/clients/${id}/inventory/movements/new`;
+    case "staff.inventory_movement":
+      return `/staff/clients/${id}/inventory/movements/${item}`;
     case "review":
       return "/review";
     case "review.assignments":
@@ -333,6 +345,13 @@ const MATCHERS: Matcher[] = [
   [new RegExp(`${STAFF_CLIENT}/purchases/bills/(${UUID})$`), "staff.purchase_bill", "itemId"],
   [new RegExp(`${STAFF_CLIENT}/purchases/payments/new$`), "staff.supplier_payment_new"],
   [new RegExp(`${STAFF_CLIENT}/purchases/payments/(${UUID})$`), "staff.supplier_payment", "itemId"],
+  [new RegExp(`${STAFF_CLIENT}/inventory$`), "staff.inventory"],
+  [new RegExp(`${STAFF_CLIENT}/inventory/movements/new$`), "staff.inventory_movement_new"],
+  [
+    new RegExp(`${STAFF_CLIENT}/inventory/movements/(${UUID})$`),
+    "staff.inventory_movement",
+    "itemId",
+  ],
   [/^\/review$/, "review"],
   [/^\/review\/assignments$/, "review.assignments"],
   [/^\/admin$/, "admin"],
@@ -458,6 +477,7 @@ export function staffClientTabs(facts: AccessFacts, clientId: string): NavItem[]
     ...item(facts, "staff.imports", "Imports", { clientId }),
     ...item(facts, "staff.sales", "Sales & receivables", { clientId }),
     ...item(facts, "staff.purchases", "Purchases & payables", { clientId }),
+    ...item(facts, "staff.inventory", "Inventory", { clientId }),
     ...item(facts, "staff.journal", "Journal", { clientId }),
     ...item(facts, "staff.trial_balance", "Trial balance", { clientId }),
     ...item(facts, "staff.ledger", "General ledger", { clientId }),

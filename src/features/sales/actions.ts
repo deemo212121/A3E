@@ -134,6 +134,7 @@ const docSchema = z.object({
     "sales_receipt",
     "purchase_bill",
     "supplier_payment",
+    "inventory_movement",
   ]),
   id: z.uuid(),
   op: z.enum(["submit", "post", "return", "cancel"]),
@@ -147,6 +148,7 @@ const POST_FN = {
   sales_receipt: "post_sales_receipt",
   purchase_bill: "post_purchase_bill",
   supplier_payment: "post_supplier_payment",
+  inventory_movement: "post_inventory_movement",
 };
 const CANCEL_FN = {
   sales_invoice: ["cancel_sales_invoice", "p_invoice_id"],
@@ -154,6 +156,7 @@ const CANCEL_FN = {
   sales_receipt: ["cancel_sales_receipt", "p_receipt_id"],
   purchase_bill: ["cancel_purchase_bill", "p_bill_id"],
   supplier_payment: ["cancel_supplier_payment", "p_payment_id"],
+  inventory_movement: ["cancel_inventory_movement", "p_movement_id"],
 } as const;
 const ID_PARAM = {
   sales_invoice: "p_invoice_id",
@@ -161,6 +164,7 @@ const ID_PARAM = {
   sales_receipt: "p_receipt_id",
   purchase_bill: "p_bill_id",
   supplier_payment: "p_payment_id",
+  inventory_movement: "p_movement_id",
 };
 
 export async function documentAction(_p: Result | null, fd: FormData): Promise<Result> {
@@ -179,7 +183,8 @@ export async function documentAction(_p: Result | null, fd: FormData): Promise<R
       await rpc(fn, {
         [param]: i.id,
         p_reason: i.comment,
-        p_reversal_date: i.reversalDate || null,
+        // stock movements reverse on their own date (moving-average order)
+        ...(i.subject === "inventory_movement" ? {} : { p_reversal_date: i.reversalDate || null }),
       });
     }
     refresh();

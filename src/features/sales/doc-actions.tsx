@@ -28,7 +28,13 @@ export function DocActions({
 }: {
   access: Access;
   clientId: string;
-  subject: "sales_invoice" | "credit_note" | "sales_receipt" | "purchase_bill" | "supplier_payment";
+  subject:
+    | "sales_invoice"
+    | "credit_note"
+    | "sales_receipt"
+    | "purchase_bill"
+    | "supplier_payment"
+    | "inventory_movement";
   id: string;
   status: string;
   preparedBy: string | null;
@@ -96,7 +102,7 @@ export function DocActions({
             >
               {hidden("cancel")}
               <TextArea label="Reason" name="comment" rows={2} required />
-              {status === "posted" ? (
+              {status === "posted" && subject !== "inventory_movement" ? (
                 <Field
                   label="Cancellation date (optional)"
                   name="reversalDate"
