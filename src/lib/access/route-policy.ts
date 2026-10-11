@@ -43,6 +43,8 @@ export interface AccessFacts {
   }[];
   /** Clients a staff member may work on (all, for managers). */
   staffClientIds: readonly string[];
+  /** Clients whose payroll the user holds an explicit grant for. */
+  payrollClientIds?: readonly string[];
 }
 
 export type RouteKey =
@@ -87,6 +89,10 @@ export type RouteKey =
   | "staff.inventory"
   | "staff.inventory_movement_new"
   | "staff.inventory_movement"
+  | "staff.payroll"
+  | "staff.payroll_run"
+  | "staff.payroll_employee"
+  | "staff.payslip"
   | "review"
   | "review.assignments"
   | "admin"
@@ -178,6 +184,19 @@ export function evaluateRoute(
     case "staff.inventory_movement":
       if (!hasRole(facts, STAFF_ROLES)) return FORBIDDEN;
       return params.clientId && facts.staffClientIds.includes(params.clientId) ? ALLOW : NOT_FOUND;
+
+    // Payroll: assigned staff WITH an explicit payroll grant (managers may
+    // open the overview to manage grants). Everyone else: not found.
+    case "staff.payroll":
+    case "staff.payroll_run":
+    case "staff.payroll_employee":
+    case "staff.payslip": {
+      if (!hasRole(facts, STAFF_ROLES)) return FORBIDDEN;
+      const id = params.clientId;
+      if (!id || !facts.staffClientIds.includes(id)) return NOT_FOUND;
+      if ((facts.payrollClientIds ?? []).includes(id)) return ALLOW;
+      return route === "staff.payroll" && facts.firmRole === "firm_manager" ? ALLOW : NOT_FOUND;
+    }
 
     case "review":
       return hasRole(facts, REVIEW_ROLES) ? ALLOW : FORBIDDEN;
@@ -286,6 +305,14 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return `/staff/clients/${id}/inventory/movements/new`;
     case "staff.inventory_movement":
       return `/staff/clients/${id}/inventory/movements/${item}`;
+    case "staff.payroll":
+      return `/staff/clients/${id}/payroll`;
+    case "staff.payroll_run":
+      return `/staff/clients/${id}/payroll/runs/${item}`;
+    case "staff.payroll_employee":
+      return `/staff/clients/${id}/payroll/employees/${item}`;
+    case "staff.payslip":
+      return `/staff/clients/${id}/payroll/payslips/${item}`;
     case "review":
       return "/review";
     case "review.assignments":
@@ -352,6 +379,10 @@ const MATCHERS: Matcher[] = [
     "staff.inventory_movement",
     "itemId",
   ],
+  [new RegExp(`${STAFF_CLIENT}/payroll$`), "staff.payroll"],
+  [new RegExp(`${STAFF_CLIENT}/payroll/runs/(${UUID})$`), "staff.payroll_run", "itemId"],
+  [new RegExp(`${STAFF_CLIENT}/payroll/employees/(${UUID})$`), "staff.payroll_employee", "itemId"],
+  [new RegExp(`${STAFF_CLIENT}/payroll/payslips/(${UUID})$`), "staff.payslip", "itemId"],
   [/^\/review$/, "review"],
   [/^\/review\/assignments$/, "review.assignments"],
   [/^\/admin$/, "admin"],
@@ -478,6 +509,7 @@ export function staffClientTabs(facts: AccessFacts, clientId: string): NavItem[]
     ...item(facts, "staff.sales", "Sales & receivables", { clientId }),
     ...item(facts, "staff.purchases", "Purchases & payables", { clientId }),
     ...item(facts, "staff.inventory", "Inventory", { clientId }),
+    ...item(facts, "staff.payroll", "Payroll", { clientId }),
     ...item(facts, "staff.journal", "Journal", { clientId }),
     ...item(facts, "staff.trial_balance", "Trial balance", { clientId }),
     ...item(facts, "staff.ledger", "General ledger", { clientId }),

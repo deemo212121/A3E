@@ -30,7 +30,7 @@ export const PERSONAS: Record<string, AccessFacts> = {
   ownerAandB: { ...none, clientMemberships: [m(A, "client_owner"), m(B, "client_viewer")] },
   firmAdmin: { ...none, firmRole: "firm_admin" },
   manager: { ...none, firmRole: "firm_manager", staffClientIds: [A, B] },
-  reviewerA: { ...none, firmRole: "reviewer", staffClientIds: [A] },
+  reviewerA: { ...none, firmRole: "reviewer", staffClientIds: [A], payrollClientIds: [A] },
   accountantB: { ...none, firmRole: "accountant", staffClientIds: [B] },
   bookkeeperNone: { ...none, firmRole: "bookkeeper" },
 };
@@ -130,6 +130,7 @@ const EXPECTED: Record<string, RouteKey[]> = {
     "staff.inventory",
     "staff.inventory_movement_new",
     "staff.inventory_movement",
+    "staff.payroll",
     "review",
     "review.assignments",
     "admin",
@@ -166,6 +167,10 @@ const EXPECTED: Record<string, RouteKey[]> = {
     "staff.inventory",
     "staff.inventory_movement_new",
     "staff.inventory_movement",
+    "staff.payroll",
+    "staff.payroll_run",
+    "staff.payroll_employee",
+    "staff.payslip",
     "review",
   ],
   accountantB: ["home", "account", "invitations", "staff"],
@@ -214,6 +219,10 @@ const ALL_ROUTES: RouteKey[] = [
   "staff.inventory",
   "staff.inventory_movement_new",
   "staff.inventory_movement",
+  "staff.payroll",
+  "staff.payroll_run",
+  "staff.payroll_employee",
+  "staff.payslip",
   "review",
   "review.assignments",
   "admin",
@@ -222,6 +231,20 @@ const ALL_ROUTES: RouteKey[] = [
   "admin.users",
   "admin.invitations",
 ];
+
+describe("payroll is by explicit grant", () => {
+  it("assigned staff without a payroll grant cannot open payroll pages", () => {
+    const noGrant: AccessFacts = { ...PERSONAS.reviewerA, payrollClientIds: [] };
+    for (const r of ["staff.payroll", "staff.payroll_run", "staff.payslip"] as const) {
+      expect(evaluateRoute(r, noGrant, { clientId: A }).allowed).toBe(false);
+    }
+    // a grant for another client does not help
+    const elsewhere: AccessFacts = { ...PERSONAS.reviewerA, payrollClientIds: [B] };
+    expect(evaluateRoute("staff.payroll", elsewhere, { clientId: A }).allowed).toBe(false);
+    // managers can open the overview (to grant access) but not payslips
+    expect(evaluateRoute("staff.payslip", PERSONAS.manager, { clientId: A }).allowed).toBe(false);
+  });
+});
 
 describe("access matrix", () => {
   for (const [persona, allowed] of Object.entries(EXPECTED)) {

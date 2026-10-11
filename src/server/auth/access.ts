@@ -36,6 +36,7 @@ const accessSchema = z.object({
     }),
   ),
   staff_client_ids: z.array(z.uuid()).default([]),
+  payroll_client_ids: z.array(z.uuid()).default([]),
 });
 export type Access = z.infer<typeof accessSchema>;
 
@@ -65,6 +66,7 @@ export function toFacts(access: Access): AccessFacts {
       code: m.code,
     })),
     staffClientIds: access.staff_client_ids,
+    payrollClientIds: access.payroll_client_ids,
   };
 }
 
