@@ -2,7 +2,7 @@
 
 > **Status: PROPOSED, pending accountant approval.** The Phase 5 instruction refers to "the approved chart of accounts". No chart had been approved, so a **generic starter** was seeded as data (`coa_templates` / `coa_template_accounts`, migration `20261010140200`). It is **not** a BIR-prescribed chart. The engine works with **any** chart: the accountant can approve this one, edit it, or supply a different one, and no code changes are needed.
 
-58 accounts (2040 added in Phase 7). ⊕ = added 2026-10-10 (migration `20261010150100`) after reviewing one client's actual books ([FIRM-WORKBOOK-REVIEW.md](FIRM-WORKBOOK-REVIEW.md)). Clients that already have a chart are not changed; add accounts to them individually.
+59 accounts (2040 added in Phase 7, 1130 in Phase 8). ⊕ = added 2026-10-10 (migration `20261010150100`) after reviewing one client's actual books ([FIRM-WORKBOOK-REVIEW.md](FIRM-WORKBOOK-REVIEW.md)). Clients that already have a chart are not changed; add accounts to them individually.
 
 | Code | Name | Type | Normal | Postable |
 |---|---|---|---|---|
@@ -13,6 +13,7 @@
 | 1100 | Accounts Receivable | asset | debit | ✓ |
 | 1110 | Allowance for Doubtful Accounts | asset (contra) | credit | ✓ |
 | 1120 | Advances to Employees ⊕ | asset | debit | ✓ |
+| 1130 | Advances to Suppliers ⊕ | asset | debit | ✓ |
 | 1200 | Inventory | asset | debit | ✓ |
 | 1210 | Raw Materials ⊕ | asset | debit | ✓ |
 | 1300 | Prepaid Expenses | asset | debit | ✓ |

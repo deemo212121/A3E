@@ -28,6 +28,8 @@
 | — | [Phase 5 report](PHASE-5-REPORT.md) | Double-entry engine: accounting, concurrency and duplicate-prevention results |
 | — | [Phase 6 report](PHASE-6-REPORT.md) | Client portal and data intake: retry-safety gate, uploads, imports, live and browser test results |
 | — | [Phase 7 report](PHASE-7-REPORT.md) | Sales and receivables: invoice records, receipts, credit notes, posting rules, reconciliation |
+| — | [Phase 8 report](PHASE-8-REPORT.md) | Purchases, expenses and payables: bills, payments, withholding data, reconciliation |
+| purchases | [Posting rules](purchases/POSTING-RULES.md) | Purchase journal entries, signed-off withholding codes, categories (pending CPA review) |
 | sales | [Posting rules](sales/POSTING-RULES.md) | Sales journal entries, rounding, controls (pending CPA review) |
 | intake | [Canonical intake schema](intake/CANONICAL-INTAKE-SCHEMA.md) | Transactions, customers/suppliers, documents, imports, workflow and retry rules (Phase 6) |
 | accounting | [Test scenarios (for accountant sign-off)](accounting/TEST-SCENARIOS.md) · [Starter chart of accounts (PROPOSED)](accounting/COA-TEMPLATE-PROPOSED.md) · [Review of the Firm's client workbooks](accounting/FIRM-WORKBOOK-REVIEW.md) | Phase 5 |

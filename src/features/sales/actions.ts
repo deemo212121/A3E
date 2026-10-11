@@ -128,7 +128,13 @@ export async function saveInvoiceAction(_p: Result | null, fd: FormData): Promis
 // ---------------------------------------------------------------------------
 const docSchema = z.object({
   clientId: z.uuid(),
-  subject: z.enum(["sales_invoice", "credit_note", "sales_receipt"]),
+  subject: z.enum([
+    "sales_invoice",
+    "credit_note",
+    "sales_receipt",
+    "purchase_bill",
+    "supplier_payment",
+  ]),
   id: z.uuid(),
   op: z.enum(["submit", "post", "return", "cancel"]),
   comment: text(1000),
@@ -139,16 +145,22 @@ const POST_FN = {
   sales_invoice: "post_sales_invoice",
   credit_note: "post_credit_note",
   sales_receipt: "post_sales_receipt",
+  purchase_bill: "post_purchase_bill",
+  supplier_payment: "post_supplier_payment",
 };
 const CANCEL_FN = {
   sales_invoice: ["cancel_sales_invoice", "p_invoice_id"],
   credit_note: ["cancel_credit_note", "p_credit_note_id"],
   sales_receipt: ["cancel_sales_receipt", "p_receipt_id"],
+  purchase_bill: ["cancel_purchase_bill", "p_bill_id"],
+  supplier_payment: ["cancel_supplier_payment", "p_payment_id"],
 } as const;
 const ID_PARAM = {
   sales_invoice: "p_invoice_id",
   credit_note: "p_credit_note_id",
   sales_receipt: "p_receipt_id",
+  purchase_bill: "p_bill_id",
+  supplier_payment: "p_payment_id",
 };
 
 export async function documentAction(_p: Result | null, fd: FormData): Promise<Result> {

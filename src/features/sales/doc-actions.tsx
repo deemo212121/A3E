@@ -28,7 +28,7 @@ export function DocActions({
 }: {
   access: Access;
   clientId: string;
-  subject: "sales_invoice" | "credit_note" | "sales_receipt";
+  subject: "sales_invoice" | "credit_note" | "sales_receipt" | "purchase_bill" | "supplier_payment";
   id: string;
   status: string;
   preparedBy: string | null;
