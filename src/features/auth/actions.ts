@@ -29,8 +29,10 @@ export async function signInAction(
         publicMessage: "Invalid email or password.",
       });
     }
-    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (aal && aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") redirect("/mfa");
+    // Ask the database whether this account must complete two-step
+    // verification (staff MFA can be switched off, e.g. during the beta).
+    const { data: access } = await supabase.rpc("get_my_access");
+    if ((access as { mfa_required?: boolean } | null)?.mfa_required) redirect("/mfa");
     redirect(safeNextPath(next));
   });
 }

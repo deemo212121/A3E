@@ -90,6 +90,11 @@ export async function createTestDb(): Promise<Db> {
       throw new Error(`Migration ${file} failed: ${(error as Error).message}`);
     }
   }
+  // MFA is off in the beta (migration 20261012220000). The tests keep it ON so
+  // the enforcement path stays verified for when it is switched back on.
+  await db.exec(
+    "update private.settings set value = 'true'::jsonb where key = 'require_staff_mfa'",
+  );
   return db;
 }
 

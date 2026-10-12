@@ -1,0 +1,32 @@
+// Cloudflare Workers config for the Next.js app (built with OpenNext).
+// Deploy: connect the GitHub repo in Cloudflare (Workers & Pages -> Create ->
+// Import a repository). See docs/setup/CLOUDFLARE-DEPLOY.md.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "a3e-accounting",
+  "main": ".open-next/worker.js",
+  "minify": true,
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "a3e-accounting"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  },
+  // Non-secret settings. Secrets (SUPABASE_SECRET_KEY) are added in the
+  // Cloudflare dashboard, never here.
+  // Keep variables set in the Cloudflare dashboard (e.g. APP_BASE_URL) on deploy.
+  "keep_vars": true,
+  "vars": {
+    "APP_ENV": "staging",
+    "LOG_LEVEL": "info"
+  }
+}

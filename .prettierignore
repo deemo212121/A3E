@@ -7,3 +7,5 @@ supabase/.temp
 supabase/.branches
 docs
 AGENTS.md
+.open-next
+.wrangler

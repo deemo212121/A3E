@@ -39,7 +39,7 @@
 | accounting | [Test scenarios (for accountant sign-off)](accounting/TEST-SCENARIOS.md) · [Starter chart of accounts (PROPOSED)](accounting/COA-TEMPLATE-PROPOSED.md) · [Review of the Firm's client workbooks](accounting/FIRM-WORKBOOK-REVIEW.md) | Phase 5 |
 | design | [Design system](design/DESIGN-SYSTEM.md) · [Information architecture and route access](design/INFORMATION-ARCHITECTURE.md) | Phase 4 (PROPOSED) |
 | security | [Access control](security/ACCESS-CONTROL.md) · [Runbook: recovery and disable](runbooks/ACCOUNT-RECOVERY-AND-DISABLE.md) · [Supabase project setup](setup/SUPABASE-AUTH-SETUP.md) | Phase 3 security docs |
-| setup | [Local development](setup/LOCAL-DEVELOPMENT.md) · [Environments](setup/ENVIRONMENTS.md) · [Migrations](setup/MIGRATIONS.md) · [Project structure](setup/PROJECT-STRUCTURE.md) · [Troubleshooting](setup/TROUBLESHOOTING.md) | Developer setup |
+| setup | [Local development](setup/LOCAL-DEVELOPMENT.md) · [Environments](setup/ENVIRONMENTS.md) · [Migrations](setup/MIGRATIONS.md) · [Project structure](setup/PROJECT-STRUCTURE.md) · [Troubleshooting](setup/TROUBLESHOOTING.md) · [Deploy to Cloudflare](setup/CLOUDFLARE-DEPLOY.md) | Developer setup and deployment |
 
 ## Verification status legend (used in docs 08–10)
 

@@ -15,8 +15,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
-  cacheComponents: true,
-  partialPrefetching: true,
+  // Cache Components / Partial Prerendering are OFF: on Cloudflare Workers
+  // (OpenNext 1.20) partially prerendered pages hang. Every page here is
+  // per-user and rendered on demand anyway. Revisit when the adapter supports it.
   experimental: {
     // Uploads go through Server Actions, one file per request. Files are capped
     // at 10 MB (src/lib/intake/files.ts); allow for multipart overhead. The

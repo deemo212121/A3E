@@ -65,3 +65,8 @@ docs/input/
 # Synthetic test fixtures (made-up data) are allowed.
 !tests/fixtures/*.xlsx
 !tests/fixtures/*.csv
+
+# cloudflare (OpenNext build output, wrangler state, local secrets)
+/.open-next/
+/.wrangler/
+.dev.vars*

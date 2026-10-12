@@ -29,7 +29,10 @@
     "test:routes": "npm run build && vitest run --config vitest.routes.config.mts",
     "seed:dev-accounts": "node scripts/seed-dev-accounts.mjs",
     "seed:dev-ledger": "node scripts/seed-dev-ledger.mjs",
-    "ui:screenshots": "node scripts/ui-screenshots.mjs"
+    "ui:screenshots": "node scripts/ui-screenshots.mjs",
+    "cf:build": "node scripts/patch-opennext.mjs && opennextjs-cloudflare build",
+    "cf:preview": "npm run cf:build && opennextjs-cloudflare preview",
+    "cf:deploy": "npm run cf:build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -44,6 +47,7 @@
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
     "@next/env": "^16.4.0",
+    "@opennextjs/cloudflare": "1.20.10",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^24.19.2",
     "@types/react": "^19",
@@ -56,9 +60,14 @@
     "supabase": "^2.120.0",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^5.0.3"
+    "vitest": "^5.0.3",
+    "wrangler": "4.149.0"
   },
   "engines": {
     "node": ">=24"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "workerd@1.20261006.1": true
   }
 }

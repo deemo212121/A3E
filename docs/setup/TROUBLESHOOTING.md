@@ -13,5 +13,5 @@
 | `npm run check:secrets` fails | A secret value or secret variable name appears in browser bundles | Find the import chain that pulls server code into a Client Component. **Rotate the key** if a real value leaked. |
 | `npm install` peer conflict for `@types/node` with Vitest | Vitest 5 requires `@types/node` 22 or ≥24 | Keep `@types/node@^24` (matches Node 24). Do not use `--force`. |
 | `npm warn allow-scripts … unrs-resolver` during install | npm 11 asks before running install scripts | Harmless for current checks (lint passes). Review with `npm approve-scripts --allow-scripts-pending` if needed. |
-| `cookies() … outside of a <Suspense> boundary` build error | Cache Components is enabled: request-time APIs must sit inside Suspense | Wrap the component that reads the session in `<Suspense>` (see `node_modules/next/dist/docs/01-app/02-guides/authentication-with-cache-components.md`) |
+| `cookies() … outside of a <Suspense> boundary` build error | (Only if Cache Components is re-enabled; it is off since 2026-10-12 for Cloudflare) request-time APIs must sit inside Suspense | Wrap the component that reads the session in `<Suspense>` (see `node_modules/next/dist/docs/01-app/02-guides/authentication-with-cache-components.md`) |
 | `AGENTS.md` reappears after you delete it | `next dev` regenerates it | Keep it committed (Next.js 16 behaviour) |
