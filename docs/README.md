@@ -34,6 +34,8 @@
 | inventory | [Costing method](inventory/COSTING-METHOD.md) | Moving weighted average and stock posting rules (PENDING VERIFICATION) |
 | — | [Phase 10 report](PHASE-10-REPORT.md) | Payroll: employees, runs, payslips, signed-off statutory tables, payments, reconciliation |
 | payroll | [Payroll rules](payroll/PAYROLL-RULES.md) | Computation engine, posting, privacy (PENDING VERIFICATION; no rates built in) |
+| — | [Phase 11 report](PHASE-11-REPORT.md) | Financial statements, drill-down, exports, reconciliation summary |
+| reports | [Accounting policies](reports/ACCOUNTING-POLICIES.md) | Statement layout, classification, cash-flow method, rounding, period close (PENDING CPA REVIEW) |
 | sales | [Posting rules](sales/POSTING-RULES.md) | Sales journal entries, rounding, controls (pending CPA review) |
 | intake | [Canonical intake schema](intake/CANONICAL-INTAKE-SCHEMA.md) | Transactions, customers/suppliers, documents, imports, workflow and retry rules (Phase 6) |
 | accounting | [Test scenarios (for accountant sign-off)](accounting/TEST-SCENARIOS.md) · [Starter chart of accounts (PROPOSED)](accounting/COA-TEMPLATE-PROPOSED.md) · [Review of the Firm's client workbooks](accounting/FIRM-WORKBOOK-REVIEW.md) | Phase 5 |

@@ -57,6 +57,7 @@ export type RouteKey =
   | "portal.team"
   | "portal.documents"
   | "portal.requests"
+  | "portal.reports"
   | "portal.transactions"
   | "portal.transaction_new"
   | "portal.transaction"
@@ -72,6 +73,8 @@ export type RouteKey =
   | "staff.entry"
   | "staff.trial_balance"
   | "staff.ledger"
+  | "staff.reports"
+  | "staff.report_account"
   | "staff.intake"
   | "staff.intake_txn"
   | "staff.imports"
@@ -142,6 +145,7 @@ export function evaluateRoute(
     case "portal.team":
     case "portal.documents":
     case "portal.requests":
+    case "portal.reports":
     case "portal.transactions":
     case "portal.transaction":
     case "portal.counterparties":
@@ -165,6 +169,8 @@ export function evaluateRoute(
     case "staff.entry":
     case "staff.trial_balance":
     case "staff.ledger":
+    case "staff.reports":
+    case "staff.report_account":
     case "staff.intake":
     case "staff.intake_txn":
     case "staff.imports":
@@ -241,6 +247,8 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return `/portal/${id}/documents`;
     case "portal.requests":
       return `/portal/${id}/requests`;
+    case "portal.reports":
+      return `/portal/${id}/reports`;
     case "portal.transactions":
       return `/portal/${id}/transactions`;
     case "portal.transaction_new":
@@ -271,6 +279,10 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return `/staff/clients/${id}/trial-balance`;
     case "staff.ledger":
       return `/staff/clients/${id}/ledger`;
+    case "staff.reports":
+      return `/staff/clients/${id}/reports`;
+    case "staff.report_account":
+      return `/staff/clients/${id}/reports/accounts/${item}`;
     case "staff.intake":
       return `/staff/clients/${id}/intake`;
     case "staff.intake_txn":
@@ -343,6 +355,7 @@ const MATCHERS: Matcher[] = [
   [new RegExp(`^/portal/(${UUID})/team$`), "portal.team"],
   [new RegExp(`^/portal/(${UUID})/documents$`), "portal.documents"],
   [new RegExp(`^/portal/(${UUID})/requests$`), "portal.requests"],
+  [new RegExp(`^/portal/(${UUID})/reports$`), "portal.reports"],
   [new RegExp(`^/portal/(${UUID})/transactions$`), "portal.transactions"],
   [new RegExp(`^/portal/(${UUID})/transactions/new$`), "portal.transaction_new"],
   [new RegExp(`^/portal/(${UUID})/transactions/(${UUID})$`), "portal.transaction", "itemId"],
@@ -358,6 +371,8 @@ const MATCHERS: Matcher[] = [
   [new RegExp(`${STAFF_CLIENT}/journal/(${UUID})$`), "staff.entry", "entryId"],
   [new RegExp(`${STAFF_CLIENT}/trial-balance$`), "staff.trial_balance"],
   [new RegExp(`${STAFF_CLIENT}/ledger$`), "staff.ledger"],
+  [new RegExp(`${STAFF_CLIENT}/reports$`), "staff.reports"],
+  [new RegExp(`${STAFF_CLIENT}/reports/accounts/(${UUID})$`), "staff.report_account", "itemId"],
   [new RegExp(`${STAFF_CLIENT}/intake$`), "staff.intake"],
   [new RegExp(`${STAFF_CLIENT}/intake/(${UUID})$`), "staff.intake_txn", "itemId"],
   [new RegExp(`${STAFF_CLIENT}/imports$`), "staff.imports"],
@@ -496,6 +511,7 @@ export function clientPortalTabs(facts: AccessFacts, clientId: string): NavItem[
     ...item(facts, "portal.profile", "Business profile", { clientId }),
     ...item(facts, "portal.contacts", "Contacts", { clientId }),
     ...item(facts, "portal.team", "Team", { clientId }),
+    ...item(facts, "portal.reports", "Financial statements", { clientId }),
     ...item(facts, "portal.requests", "Requests", { clientId }),
   ];
 }
@@ -511,6 +527,7 @@ export function staffClientTabs(facts: AccessFacts, clientId: string): NavItem[]
     ...item(facts, "staff.inventory", "Inventory", { clientId }),
     ...item(facts, "staff.payroll", "Payroll", { clientId }),
     ...item(facts, "staff.journal", "Journal", { clientId }),
+    ...item(facts, "staff.reports", "Reports", { clientId }),
     ...item(facts, "staff.trial_balance", "Trial balance", { clientId }),
     ...item(facts, "staff.ledger", "General ledger", { clientId }),
     ...item(facts, "staff.accounts", "Chart of accounts", { clientId }),

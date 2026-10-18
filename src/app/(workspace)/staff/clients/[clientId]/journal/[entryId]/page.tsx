@@ -17,6 +17,7 @@ import {
 } from "@/features/ledger/actions";
 import { EntryForm } from "@/features/ledger/components/entry-form";
 import { renderStaffClientPage } from "@/features/ledger/staff-client-frame";
+import { sourceLink } from "@/features/reports/source-link";
 import { pathFor, REVIEW_ROLES } from "@/lib/access/route-policy";
 import { todayManila } from "@/lib/dates";
 import { formatAmount, sumAmounts } from "@/lib/money/amount";
@@ -91,7 +92,20 @@ async function Entry({ params }: { params: Promise<{ clientId: string; entryId: 
               </div>
               <div>
                 <dt className="text-[var(--muted)]">Source</dt>
-                <dd>{entry.source_ref ? `${entry.source_type}: ${entry.source_ref}` : "—"}</dd>
+                <dd>
+                  {(() => {
+                    const src = sourceLink(entry.client_id, entry.source_type, entry.source_ref);
+                    if (!src)
+                      return entry.source_ref ? `${entry.source_type}: ${entry.source_ref}` : "—";
+                    return src.href ? (
+                      <Link className="underline" href={src.href}>
+                        {src.label}
+                      </Link>
+                    ) : (
+                      src.label
+                    );
+                  })()}
+                </dd>
               </div>
             </dl>
             {entry.reverses_entry_id ? (
