@@ -92,6 +92,10 @@ export type RouteKey =
   | "staff.inventory"
   | "staff.inventory_movement_new"
   | "staff.inventory_movement"
+  | "staff.tax"
+  | "staff.tax_computation"
+  | "tax_rules"
+  | "tax_rule"
   | "staff.payroll"
   | "staff.payroll_run"
   | "staff.payroll_employee"
@@ -161,6 +165,8 @@ export function evaluateRoute(
     }
 
     case "staff":
+    case "tax_rules":
+    case "tax_rule":
       return hasRole(facts, STAFF_ROLES) ? ALLOW : FORBIDDEN;
     case "staff.client":
     case "staff.accounts":
@@ -171,6 +177,8 @@ export function evaluateRoute(
     case "staff.ledger":
     case "staff.reports":
     case "staff.report_account":
+    case "staff.tax":
+    case "staff.tax_computation":
     case "staff.intake":
     case "staff.intake_txn":
     case "staff.imports":
@@ -265,6 +273,14 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return `/portal/${id}/imports/${item}`;
     case "staff":
       return "/staff";
+    case "tax_rules":
+      return "/tax-rules";
+    case "tax_rule":
+      return `/tax-rules/${item}`;
+    case "staff.tax":
+      return `/staff/clients/${id}/tax`;
+    case "staff.tax_computation":
+      return `/staff/clients/${id}/tax/${item}`;
     case "staff.client":
       return `/staff/clients/${id}`;
     case "staff.accounts":
@@ -364,6 +380,11 @@ const MATCHERS: Matcher[] = [
   [new RegExp(`^/portal/(${UUID})/imports$`), "portal.imports"],
   [new RegExp(`^/portal/(${UUID})/imports/(${UUID})$`), "portal.import", "itemId"],
   [/^\/staff$/, "staff"],
+  [/^\/tax-rules$/, "tax_rules"],
+  // Firm-wide (no client): the empty first group stands in for the client id.
+  [new RegExp(`^/tax-rules/()(${UUID})$`), "tax_rule", "itemId"],
+  [new RegExp(`${STAFF_CLIENT}/tax$`), "staff.tax"],
+  [new RegExp(`${STAFF_CLIENT}/tax/(${UUID})$`), "staff.tax_computation", "itemId"],
   [new RegExp(`${STAFF_CLIENT}$`), "staff.client"],
   [new RegExp(`${STAFF_CLIENT}/accounts$`), "staff.accounts"],
   [new RegExp(`${STAFF_CLIENT}/periods$`), "staff.periods"],
@@ -430,6 +451,7 @@ export const PROTECTED_PREFIXES = [
   "/staff",
   "/review",
   "/admin",
+  "/tax-rules",
 ];
 
 // ---------------------------------------------------------------------------
@@ -469,7 +491,14 @@ export function buildNavigation(facts: AccessFacts): NavSection[] {
         ),
       ],
     },
-    { id: "staff", label: "Accounting staff", items: item(facts, "staff", "My clients") },
+    {
+      id: "staff",
+      label: "Accounting staff",
+      items: [
+        ...item(facts, "staff", "My clients"),
+        ...item(facts, "tax_rules", "Tax rules registry"),
+      ],
+    },
     {
       id: "review",
       label: "Review workspace",
@@ -528,6 +557,7 @@ export function staffClientTabs(facts: AccessFacts, clientId: string): NavItem[]
     ...item(facts, "staff.payroll", "Payroll", { clientId }),
     ...item(facts, "staff.journal", "Journal", { clientId }),
     ...item(facts, "staff.reports", "Reports", { clientId }),
+    ...item(facts, "staff.tax", "Tax", { clientId }),
     ...item(facts, "staff.trial_balance", "Trial balance", { clientId }),
     ...item(facts, "staff.ledger", "General ledger", { clientId }),
     ...item(facts, "staff.accounts", "Chart of accounts", { clientId }),
