@@ -106,8 +106,18 @@ export type RouteKey =
   | "staff.payroll_run"
   | "staff.payroll_employee"
   | "staff.payslip"
+  | "work"
+  | "calendar"
+  | "deadlines"
+  | "notifications"
+  | "tour"
+  | "staff.operations"
+  | "staff.filing"
+  | "staff.work_item"
   | "review"
   | "review.assignments"
+  | "review.exceptions"
+  | "review.activity"
   | "admin"
   | "admin.clients"
   | "admin.client"
@@ -146,6 +156,8 @@ export function evaluateRoute(
     case "home":
     case "account":
     case "invitations":
+    case "notifications":
+    case "tour":
       return ALLOW;
 
     case "portal":
@@ -177,6 +189,9 @@ export function evaluateRoute(
     case "tax_form":
     case "eoutputs":
     case "eoutput":
+    case "work":
+    case "calendar":
+    case "deadlines":
       return hasRole(facts, STAFF_ROLES) ? ALLOW : FORBIDDEN;
     case "staff.client":
     case "staff.accounts":
@@ -191,6 +206,9 @@ export function evaluateRoute(
     case "staff.tax_computation":
     case "staff.workpaper":
     case "staff.output_run":
+    case "staff.operations":
+    case "staff.filing":
+    case "staff.work_item":
     case "staff.intake":
     case "staff.intake_txn":
     case "staff.imports":
@@ -228,6 +246,11 @@ export function evaluateRoute(
       return hasRole(facts, REVIEW_ROLES) ? ALLOW : FORBIDDEN;
     case "review.assignments":
       return hasRole(facts, ["firm_manager"]) ? ALLOW : FORBIDDEN;
+    case "review.exceptions":
+      return hasRole(facts, REVIEW_ROLES) ? ALLOW : FORBIDDEN;
+    // Managers: all; reviewers: their clients; firm admins: firm-level events only.
+    case "review.activity":
+      return hasRole(facts, ["firm_admin", "firm_manager", "reviewer"]) ? ALLOW : FORBIDDEN;
 
     case "admin":
     case "admin.clients":
@@ -255,6 +278,22 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return "/account";
     case "invitations":
       return "/invitations";
+    case "notifications":
+      return "/notifications";
+    case "tour":
+      return "/tour";
+    case "work":
+      return "/work";
+    case "calendar":
+      return "/calendar";
+    case "deadlines":
+      return "/deadlines";
+    case "staff.operations":
+      return `/staff/clients/${id}/operations`;
+    case "staff.filing":
+      return `/staff/clients/${id}/operations/filings/${item}`;
+    case "staff.work_item":
+      return `/staff/clients/${id}/operations/work/${item}`;
     case "portal":
       return "/portal";
     case "portal.client":
@@ -369,6 +408,10 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return "/review";
     case "review.assignments":
       return "/review/assignments";
+    case "review.exceptions":
+      return "/review/exceptions";
+    case "review.activity":
+      return "/review/activity";
     case "admin":
       return "/admin";
     case "admin.clients":
@@ -389,6 +432,14 @@ const MATCHERS: Matcher[] = [
   [/^\/app$/, "home"],
   [/^\/account$/, "account"],
   [/^\/invitations$/, "invitations"],
+  [/^\/notifications$/, "notifications"],
+  [/^\/tour$/, "tour"],
+  [/^\/work$/, "work"],
+  [/^\/calendar$/, "calendar"],
+  [/^\/deadlines$/, "deadlines"],
+  [new RegExp(`${STAFF_CLIENT}/operations$`), "staff.operations"],
+  [new RegExp(`${STAFF_CLIENT}/operations/filings/(${UUID})$`), "staff.filing", "itemId"],
+  [new RegExp(`${STAFF_CLIENT}/operations/work/(${UUID})$`), "staff.work_item", "itemId"],
   [/^\/portal$/, "portal"],
   [new RegExp(`^/portal/(${UUID})$`), "portal.client"],
   [new RegExp(`^/portal/(${UUID})/contacts$`), "portal.contacts"],
@@ -451,6 +502,8 @@ const MATCHERS: Matcher[] = [
   [new RegExp(`${STAFF_CLIENT}/payroll/payslips/(${UUID})$`), "staff.payslip", "itemId"],
   [/^\/review$/, "review"],
   [/^\/review\/assignments$/, "review.assignments"],
+  [/^\/review\/exceptions$/, "review.exceptions"],
+  [/^\/review\/activity$/, "review.activity"],
   [/^\/admin$/, "admin"],
   [/^\/admin\/clients$/, "admin.clients"],
   [new RegExp(`^/admin/clients/(${UUID})$`), "admin.client"],
@@ -484,6 +537,11 @@ export const PROTECTED_PREFIXES = [
   "/tax-rules",
   "/tax-forms",
   "/e-outputs",
+  "/notifications",
+  "/tour",
+  "/work",
+  "/calendar",
+  "/deadlines",
 ];
 
 // ---------------------------------------------------------------------------
@@ -527,7 +585,10 @@ export function buildNavigation(facts: AccessFacts): NavSection[] {
       id: "staff",
       label: "Accounting staff",
       items: [
+        ...item(facts, "work", "My work queue"),
         ...item(facts, "staff", "My clients"),
+        ...item(facts, "calendar", "Filing calendar"),
+        ...item(facts, "deadlines", "Deadline rules"),
         ...item(facts, "tax_rules", "Tax rules registry"),
         ...item(facts, "tax_forms", "Tax forms registry"),
         ...item(facts, "eoutputs", "Electronic outputs & e-invoicing"),
@@ -539,6 +600,8 @@ export function buildNavigation(facts: AccessFacts): NavSection[] {
       items: [
         ...item(facts, "review", "Review queue"),
         ...item(facts, "review.assignments", "Staff assignments"),
+        ...item(facts, "review.exceptions", "Exception requests"),
+        ...item(facts, "review.activity", "Activity reports"),
       ],
     },
     {
@@ -555,6 +618,8 @@ export function buildNavigation(facts: AccessFacts): NavSection[] {
       id: "account",
       label: "Account",
       items: [
+        ...item(facts, "tour", "System tour"),
+        ...item(facts, "notifications", "Notifications"),
         ...item(facts, "account", "My account"),
         ...item(facts, "invitations", "My invitations"),
       ],
@@ -583,6 +648,7 @@ export function clientPortalTabs(facts: AccessFacts, clientId: string): NavItem[
 export function staffClientTabs(facts: AccessFacts, clientId: string): NavItem[] {
   return [
     ...item(facts, "staff.client", "Overview", { clientId }),
+    ...item(facts, "staff.operations", "Operations", { clientId }),
     ...item(facts, "staff.intake", "Intake", { clientId }),
     ...item(facts, "staff.imports", "Imports", { clientId }),
     ...item(facts, "staff.sales", "Sales & receivables", { clientId }),

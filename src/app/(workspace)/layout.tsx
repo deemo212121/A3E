@@ -6,6 +6,7 @@ import { PageSkeleton } from "@/components/ui/primitives";
 import { buildNavigation } from "@/lib/access/route-policy";
 import { roleLabel } from "@/lib/access/labels";
 import { getCurrentAccess, toFacts } from "@/server/auth/access";
+import { countUnreadNotifications } from "@/server/data/operations";
 import { listMyInvitations } from "@/server/data/workspace";
 
 /**
@@ -33,7 +34,10 @@ async function Shell({ children }: { children: React.ReactNode }) {
   if (!access.is_active) redirect("/account-disabled");
   if (access.mfa_required) redirect("/mfa");
 
-  const invitations = await listMyInvitations();
+  const [invitations, unread] = await Promise.all([
+    listMyInvitations(),
+    countUnreadNotifications().catch(() => 0),
+  ]);
   const facts = toFacts(access);
   const roleText = access.firm_role
     ? roleLabel(access.firm_role)
@@ -45,7 +49,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
     <AppShell
       sections={buildNavigation(facts)}
       user={{ name: access.full_name, email: access.email, roleLabel: roleText }}
-      notificationCount={invitations.length}
+      notificationCount={invitations.length + unread}
     >
       {children}
     </AppShell>

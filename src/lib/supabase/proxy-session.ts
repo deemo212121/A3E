@@ -5,6 +5,8 @@ import { getPublicEnv } from "@/lib/env/public";
 import { EnvValidationError } from "@/lib/env/schema";
 import { createLogger } from "@/lib/logging/logger";
 
+import { hardenSessionCookie } from "./cookies";
+
 const log = createLogger({ bindings: { service: "a3e-web", component: "proxy" } });
 let warnedMissingEnv = false;
 
@@ -17,9 +19,11 @@ let warnedMissingEnv = false;
 export async function updateSupabaseSession(
   request: NextRequest,
   requestId: string,
+  extraRequestHeaders: Record<string, string> = {},
 ): Promise<{ response: NextResponse; hasUser: boolean }> {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-request-id", requestId);
+  for (const [k, v] of Object.entries(extraRequestHeaders)) requestHeaders.set(k, v);
   let response = NextResponse.next({ request: { headers: requestHeaders } });
 
   let env;
@@ -50,7 +54,7 @@ export async function updateSupabaseSession(
           for (const { name, value } of cookiesToSet) request.cookies.set(name, value);
           response = NextResponse.next({ request: { headers: requestHeaders } });
           for (const { name, value, options } of cookiesToSet) {
-            response.cookies.set(name, value, options);
+            response.cookies.set(name, value, hardenSessionCookie(options));
           }
           // Cache headers supplied by @supabase/ssr so CDNs never cache a
           // response carrying one user's session cookie.

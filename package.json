@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:secrets": "node scripts/check-bundle-secrets.mjs",
+    "smoke": "node scripts/smoke-production.mjs",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build && npm run check:secrets",
     "db:start": "supabase start",
     "db:stop": "supabase stop",

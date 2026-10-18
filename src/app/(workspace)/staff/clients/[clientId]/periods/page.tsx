@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 
 import { ActionForm, Field, Select } from "@/components/ui/action-form";
@@ -6,7 +7,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { Badge, PageSkeleton, Section } from "@/components/ui/primitives";
 import { createFiscalYearAction, setPeriodStatusAction } from "@/features/ledger/actions";
 import { renderStaffClientPage } from "@/features/ledger/staff-client-frame";
-import { REVIEW_ROLES } from "@/lib/access/route-policy";
+import { pathFor, REVIEW_ROLES } from "@/lib/access/route-policy";
 import { hasFirmRole } from "@/server/auth/access";
 import { listFiscalYears } from "@/server/data/ledger";
 
@@ -73,8 +74,17 @@ async function Periods({ params }: { params: Promise<{ clientId: string }> }) {
                           header: "Change",
                           srOnlyHeader: true,
                           cell: (p: (typeof y.periods)[number]) =>
-                            p.status === "locked" && !isManager ? (
-                              <span className="text-xs">Managers only</span>
+                            p.status === "locked" ? (
+                              <span className="text-xs">
+                                Locked. Reopening needs an approved{" "}
+                                <Link
+                                  className="underline"
+                                  href={pathFor("staff.operations", { clientId: client.id })}
+                                >
+                                  exception request
+                                </Link>
+                                .
+                              </span>
                             ) : (
                               <ActionForm
                                 action={setPeriodStatusAction}
@@ -88,14 +98,7 @@ async function Periods({ params }: { params: Promise<{ clientId: string }> }) {
                                   label={`Status for period ${p.period_no}`}
                                   name="status"
                                   defaultValue={p.status}
-                                  options={
-                                    p.status === "locked"
-                                      ? [
-                                          { value: "locked", label: "Locked" },
-                                          ...statusOptions.filter((o) => o.value !== "locked"),
-                                        ]
-                                      : statusOptions
-                                  }
+                                  options={statusOptions}
                                 />
                                 <Field label="Reason" name="reason" />
                               </ActionForm>

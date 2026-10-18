@@ -46,7 +46,7 @@ These rules were verified by deliberately violating them in throwaway files: ESL
 
 | Client | File | Acts as | Use in |
 |---|---|---|---|
-| Browser | `src/lib/supabase/browser.ts` | Signed-in user (RLS) | Client Components |
+| Browser | none by design | — | Session cookies are HttpOnly (`src/lib/supabase/cookies.ts`); pages get data from the server only |
 | Server | `src/lib/supabase/server.ts` | Signed-in user (RLS) | Server Components, Server Functions, Route Handlers |
 | Proxy session | `src/lib/supabase/proxy-session.ts` | Refreshes session cookies | `src/proxy.ts` only |
 | **Admin** | `src/lib/supabase/admin.ts` | **Service (bypasses RLS)** | `src/server/**` only, after authorization checks |

@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
 /**
- * Baseline security headers. A nonce-based Content-Security-Policy is planned
- * for a later phase (it requires per-request rendering; see
- * node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md).
+ * Baseline security headers. The nonce-based Content-Security-Policy is set
+ * per request by the proxy (src/proxy.ts, src/lib/security/csp.ts).
  */
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },

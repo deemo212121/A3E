@@ -45,11 +45,18 @@ export function AppShell({
         </div>
         <div className="flex items-center gap-3">
           <Link
-            href="/invitations"
+            href="/tour"
+            className="rounded-md border border-[var(--border)] px-2 py-1 text-sm"
+            aria-label="System tour: how the process works"
+          >
+            <span aria-hidden>🧭</span> Tour
+          </Link>
+          <Link
+            href="/notifications"
             className="relative rounded-md border border-[var(--border)] px-2 py-1 text-sm"
             aria-label={
               notificationCount > 0
-                ? `Notifications: ${notificationCount} pending invitation${notificationCount === 1 ? "" : "s"}`
+                ? `Notifications: ${notificationCount} unread`
                 : "Notifications: none"
             }
           >

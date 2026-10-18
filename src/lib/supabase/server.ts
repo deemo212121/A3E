@@ -7,6 +7,8 @@ import { connection } from "next/server";
 
 import { getPublicEnv } from "@/lib/env/public";
 
+import { hardenSessionCookie } from "./cookies";
+
 /**
  * Supabase client for Server Components, Server Functions and Route Handlers.
  *
@@ -34,7 +36,7 @@ export async function createSupabaseServerClient(): Promise<SupabaseClient> {
         setAll(cookiesToSet) {
           try {
             for (const { name, value, options } of cookiesToSet) {
-              cookieStore.set(name, value, options);
+              cookieStore.set(name, value, hardenSessionCookie(options));
             }
           } catch {
             // Server Components cannot set cookies. Session refresh is handled

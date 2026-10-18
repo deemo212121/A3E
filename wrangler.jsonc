@@ -29,4 +29,22 @@
     "APP_ENV": "staging",
     "LOG_LEVEL": "info",
   },
+  // Production is a SEPARATE Worker (deploy with --env production) with its own
+  // Supabase project and secrets. See docs/deploy/PRODUCTION-DEPLOYMENT-PLAN.md.
+  // vars and services are not inherited, so they are repeated here.
+  "env": {
+    "production": {
+      "name": "a3e-production",
+      "services": [
+        {
+          "binding": "WORKER_SELF_REFERENCE",
+          "service": "a3e-production",
+        },
+      ],
+      "vars": {
+        "APP_ENV": "production",
+        "LOG_LEVEL": "info",
+      },
+    },
+  },
 }

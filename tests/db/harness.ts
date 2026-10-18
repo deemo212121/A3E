@@ -77,11 +77,12 @@ alter default privileges in schema public grant execute on functions to anon, au
 
 export type Db = PGlite;
 
-export async function createTestDb(): Promise<Db> {
+/** `skip`: migration files to leave out (e.g. the optional payroll module). */
+export async function createTestDb(opts: { skip?: RegExp } = {}): Promise<Db> {
   const db = new PGlite();
   await db.exec(SUPABASE_STUB);
   const files = readdirSync(MIGRATIONS_DIR)
-    .filter((f) => f.endsWith(".sql"))
+    .filter((f) => f.endsWith(".sql") && !opts.skip?.test(f))
     .sort();
   for (const file of files) {
     try {

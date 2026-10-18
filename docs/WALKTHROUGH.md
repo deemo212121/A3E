@@ -5,6 +5,8 @@ Use this to see and verify what has been built so far. Everything is **fake DEMO
 **Start the app:** run `npm run dev`, then open http://localhost:3000/login.
 **Passwords:** see `dev-accounts.local.txt` (run `npm run seed:dev-accounts` for new ones).
 
+**New here? Start with the System tour:** after signing in, click **🧭 Tour** at the top right (or open `/tour`). It walks through the whole process step by step (who does what, and the safeguards at each step) and links to the pages your role can open.
+
 Tick each box as you go. If something does not match, write down what you saw.
 
 ---
