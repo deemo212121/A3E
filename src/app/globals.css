@@ -146,3 +146,15 @@ body {
     display: none;
   }
 }
+
+/* Guided tour: the section the current step is about. */
+.tour-highlight {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 0.75rem;
+  transition: outline-color 0.3s;
+}
+/* Keep the bottom of each page reachable above the floating tour panel. */
+body:has(aside[aria-label="Guided tour"]) main {
+  padding-bottom: 45vh;
+}

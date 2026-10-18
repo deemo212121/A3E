@@ -27,11 +27,12 @@ beforeAll(async () => {
 }, 120_000);
 
 describe("production readiness check", () => {
-  it("passes on a clean, migrated database once the purge switch is off", async () => {
+  it("passes on a clean, migrated database once the development switches are off", async () => {
     const before = await run();
     expect(before["Synthetic-data purge disabled"]).toBe("FAIL"); // migrations default it on
+    expect(before["Tour sample-data sandbox disabled"]).toBe("FAIL"); // on for development
     await db.exec(
-      "update private.settings set value = 'false'::jsonb where key = 'allow_synthetic_purge'",
+      "update private.settings set value = 'false'::jsonb where key in ('allow_synthetic_purge', 'allow_tour_sandbox')",
     );
     const after = await run();
     const notPass = Object.entries(after).filter(([, s]) => s !== "PASS");

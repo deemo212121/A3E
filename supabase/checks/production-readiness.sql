@@ -25,6 +25,10 @@ checks as (
          case when coalesce((select v from settings where key = 'allow_synthetic_purge'), 'false') = 'false' then 'PASS' else 'FAIL' end,
          'allow_synthetic_purge = ' || coalesce((select v from settings where key = 'allow_synthetic_purge'), 'missing')
   union all
+  select 35, 'Tour sample-data sandbox disabled',
+         case when coalesce((select v from settings where key = 'allow_tour_sandbox'), 'false') = 'false' then 'PASS' else 'FAIL' end,
+         'allow_tour_sandbox = ' || coalesce((select v from settings where key = 'allow_tour_sandbox'), 'missing')
+  union all
   select 40, 'RLS enabled and forced on every public table',
          case when not exists (select 1 from tables where not (relrowsecurity and relforcerowsecurity)) then 'PASS' else 'FAIL' end,
          coalesce((select string_agg(relname, ', ') from tables where not (relrowsecurity and relforcerowsecurity)), 'all tables')
@@ -77,10 +81,11 @@ checks as (
          case when (select count(*) from public.firm_memberships where role = 'firm_admin') between 1 and 2 then 'PASS' else 'REVIEW' end,
          (select count(*)::text from public.firm_memberships where role = 'firm_admin') || ' firm admin(s)'
   union all
-  select 140, 'No TEST-ONLY tax definitions',
-         case when not exists (select 1 from public.tax_rules where code ~ '^TEST' or sources::text ~* 'test only')
-               and not exists (select 1 from public.tax_forms where form_code ~ '^TEST' or official_version ~* 'test')
-               and not exists (select 1 from public.output_specs where output_code ~ '^TEST' or spec_source::text ~* 'test only')
+  select 140, 'No TEST-ONLY or TOUR ONLY tax definitions',
+         case when not exists (select 1 from public.tax_rules where code ~ '^(TEST|TOUR)' or sources::text ~* '(test|tour) only')
+               and not exists (select 1 from public.tax_forms where form_code ~ '^(TEST|TOUR)' or official_version ~* '(test|tour)')
+               and not exists (select 1 from public.output_specs where output_code ~ '^(TEST|TOUR)' or spec_source::text ~* '(test|tour) only')
+               and not exists (select 1 from public.deadline_rules where code ~ '^(TEST|TOUR)')
               then 'PASS' else 'FAIL' end,
          ''
   union all

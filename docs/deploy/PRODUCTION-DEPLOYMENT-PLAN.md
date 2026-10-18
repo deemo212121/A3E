@@ -79,6 +79,7 @@ Rules:
 6. **Production-only settings**, run once in the SQL Editor after the migrations:
    ```sql
    update private.settings set value = 'false'::jsonb where key = 'allow_synthetic_purge';
+   update private.settings set value = 'false'::jsonb where key = 'allow_tour_sandbox';
    update private.settings set value = 'true'::jsonb  where key = 'require_staff_mfa';
    ```
 7. **RLS verification:** run `supabase/checks/production-readiness.sql`.

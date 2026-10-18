@@ -5,7 +5,7 @@ Use this to see and verify what has been built so far. Everything is **fake DEMO
 **Start the app:** run `npm run dev`, then open http://localhost:3000/login.
 **Passwords:** see `dev-accounts.local.txt` (run `npm run seed:dev-accounts` for new ones).
 
-**New here? Start with the System tour:** after signing in, click **🧭 Tour** at the top right (or open `/tour`). It walks through the whole process step by step (who does what, and the safeguards at each step) and links to the pages your role can open.
+**New here? Start with the guided System tour:** sign in as `demo.manager@example.com`, click **🧭 Tour** at the top right, then **Create sample data** and **Start the guided tour**. A floating guide takes you page by page through a sample client (DEMO Tour Sample Co.) whose records went all the way from client submission to a return ready to file, each step done by the right demo person. Some items are left for you to finish (post an invoice, review a purchase, confirm a filing). Sign in as `demo.owner`, `demo.accountant` and `demo.reviewer` and take the tour again to see each side. Needs SQL 0036 to 0045 and `npm run seed:dev-accounts` (adds the demo reviewer).
 
 Tick each box as you go. If something does not match, write down what you saw.
 

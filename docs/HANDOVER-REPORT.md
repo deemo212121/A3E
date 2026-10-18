@@ -25,7 +25,7 @@
 | 15 | Firm operations: work queues, filing calendar with distinct statuses through **actual filing confirmation**, document requests, notifications, service status, exceptions, activity reports | `PHASE-15-REPORT.md` |
 | 16 | Security hardening and end-to-end tests: one critical and one high issue fixed; CSP; HttpOnly cookies; 75× faster ledger reads; backup drill | `PHASE-16-REPORT.md` |
 | 17 | Production deployment plan, separate production Worker configuration, readiness SQL, smoke test | `PHASE-17-REPORT.md` |
-| 18 | Operations handbook, BIR update checklist, this report; **in-app System tour** (`/tour`, header **Tour** button): the whole process step by step for each role, linking only to pages the user may open | — |
+| 18 | Operations handbook, BIR update checklist, this report; **in-app System tour** (`/tour`, header **Tour** button): the whole process step by step for each role; plus a **guided tour with sample data** (development and staging only, migration 0045): a synthetic sample client built through the real workflows, and a floating guide that walks the real pages | — |
 
 Deployment infrastructure: Cloudflare Workers (OpenNext) and Supabase (Postgres, Auth, Storage).
 

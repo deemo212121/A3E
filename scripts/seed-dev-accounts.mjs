@@ -46,6 +46,12 @@ const ACCOUNTS = [
     firmRole: "firm_manager",
   },
   {
+    key: "reviewer",
+    email: "demo.reviewer@example.com",
+    name: "DEMO Reviewer",
+    firmRole: "reviewer",
+  },
+  {
     key: "accountant",
     email: "demo.accountant@example.com",
     name: "DEMO Accountant",

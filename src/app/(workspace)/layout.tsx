@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { AppShell, ShellSkeleton } from "@/components/shell/app-shell";
 import { PageSkeleton } from "@/components/ui/primitives";
+import { GuidedTourPanel } from "@/features/tour/guided-tour";
 import { buildNavigation } from "@/lib/access/route-policy";
 import { roleLabel } from "@/lib/access/labels";
 import { getCurrentAccess, toFacts } from "@/server/auth/access";
@@ -52,6 +53,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
       notificationCount={invitations.length + unread}
     >
       {children}
+      <GuidedTourPanel />
     </AppShell>
   );
 }
