@@ -96,6 +96,9 @@ export type RouteKey =
   | "staff.tax_computation"
   | "tax_rules"
   | "tax_rule"
+  | "tax_forms"
+  | "tax_form"
+  | "staff.workpaper"
   | "staff.payroll"
   | "staff.payroll_run"
   | "staff.payroll_employee"
@@ -167,6 +170,8 @@ export function evaluateRoute(
     case "staff":
     case "tax_rules":
     case "tax_rule":
+    case "tax_forms":
+    case "tax_form":
       return hasRole(facts, STAFF_ROLES) ? ALLOW : FORBIDDEN;
     case "staff.client":
     case "staff.accounts":
@@ -179,6 +184,7 @@ export function evaluateRoute(
     case "staff.report_account":
     case "staff.tax":
     case "staff.tax_computation":
+    case "staff.workpaper":
     case "staff.intake":
     case "staff.intake_txn":
     case "staff.imports":
@@ -277,6 +283,12 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return "/tax-rules";
     case "tax_rule":
       return `/tax-rules/${item}`;
+    case "tax_forms":
+      return "/tax-forms";
+    case "tax_form":
+      return `/tax-forms/${item}`;
+    case "staff.workpaper":
+      return `/staff/clients/${id}/tax/workpapers/${item}`;
     case "staff.tax":
       return `/staff/clients/${id}/tax`;
     case "staff.tax_computation":
@@ -383,6 +395,9 @@ const MATCHERS: Matcher[] = [
   [/^\/tax-rules$/, "tax_rules"],
   // Firm-wide (no client): the empty first group stands in for the client id.
   [new RegExp(`^/tax-rules/()(${UUID})$`), "tax_rule", "itemId"],
+  [/^\/tax-forms$/, "tax_forms"],
+  [new RegExp(`^/tax-forms/()(${UUID})$`), "tax_form", "itemId"],
+  [new RegExp(`${STAFF_CLIENT}/tax/workpapers/(${UUID})$`), "staff.workpaper", "itemId"],
   [new RegExp(`${STAFF_CLIENT}/tax$`), "staff.tax"],
   [new RegExp(`${STAFF_CLIENT}/tax/(${UUID})$`), "staff.tax_computation", "itemId"],
   [new RegExp(`${STAFF_CLIENT}$`), "staff.client"],
@@ -452,6 +467,7 @@ export const PROTECTED_PREFIXES = [
   "/review",
   "/admin",
   "/tax-rules",
+  "/tax-forms",
 ];
 
 // ---------------------------------------------------------------------------
@@ -497,6 +513,7 @@ export function buildNavigation(facts: AccessFacts): NavSection[] {
       items: [
         ...item(facts, "staff", "My clients"),
         ...item(facts, "tax_rules", "Tax rules registry"),
+        ...item(facts, "tax_forms", "Tax forms registry"),
       ],
     },
     {

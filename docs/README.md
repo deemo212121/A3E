@@ -38,6 +38,8 @@
 | reports | [Accounting policies](reports/ACCOUNTING-POLICIES.md) | Statement layout, classification, cash-flow method, rounding, period close (PENDING CPA REVIEW) |
 | — | [Phase 12 report](PHASE-12-REPORT.md) | Tax rules registry and computation framework (no rules shipped) |
 | tax | [Tax engine](tax/TAX-ENGINE.md) | Registry, formula language, approval gate, computation statuses, lineage |
+| — | [Phase 13 report](PHASE-13-REPORT.md) | BIR forms framework: definitions, workpapers, traceability, sign-off (no forms shipped) |
+| tax | [Forms](tax/FORMS.md) | Form definitions, verification and sign-off gates, workpapers, exports |
 | sales | [Posting rules](sales/POSTING-RULES.md) | Sales journal entries, rounding, controls (pending CPA review) |
 | intake | [Canonical intake schema](intake/CANONICAL-INTAKE-SCHEMA.md) | Transactions, customers/suppliers, documents, imports, workflow and retry rules (Phase 6) |
 | accounting | [Test scenarios (for accountant sign-off)](accounting/TEST-SCENARIOS.md) · [Starter chart of accounts (PROPOSED)](accounting/COA-TEMPLATE-PROPOSED.md) · [Review of the Firm's client workbooks](accounting/FIRM-WORKBOOK-REVIEW.md) | Phase 5 |

@@ -9,6 +9,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { Alert, Badge, PageSkeleton, Section } from "@/components/ui/primitives";
 import { renderStaffClientPage } from "@/features/ledger/staff-client-frame";
 import { taxClientAction } from "@/features/tax/actions";
+import { workpaperAction } from "@/features/tax/form-actions";
 import { STATUS_TONE } from "@/features/tax/labels";
 import { pathFor } from "@/lib/access/route-policy";
 import { listAccounts } from "@/server/data/ledger";
@@ -20,6 +21,7 @@ import {
   listTaxRules,
 } from "@/server/data/tax";
 import { getTaxRule } from "@/server/data/tax";
+import { listWorkpapers } from "@/server/data/forms";
 
 export const metadata: Metadata = { title: "Tax" };
 
@@ -44,6 +46,7 @@ async function Tax({ params }: { params: Promise<{ clientId: string }> }) {
       listTaxRules(),
       listAccounts(client.id),
     ]);
+    const workpapers = await listWorkpapers(client.id);
     const hidden = (op: string, id = "") => (
       <>
         <input type="hidden" name="clientId" value={client.id} />
@@ -257,6 +260,56 @@ async function Tax({ params }: { params: Promise<{ clientId: string }> }) {
                   name="adjustments"
                   rows={3}
                   hint="Kept separate from the books, with the reason and reference shown on the computation."
+                />
+              </ActionForm>
+            </div>
+          </details>
+        </Section>
+
+        <Section title="Form workpapers">
+          <DataTable
+            caption="Workpapers"
+            rows={workpapers}
+            rowKey={(w) => w.id}
+            empty="No workpapers yet."
+            columns={[
+              {
+                header: "Form / period",
+                cell: (w) => (
+                  <Link
+                    className="font-medium text-[var(--accent)] hover:underline"
+                    href={pathFor("staff.workpaper", { clientId: client.id, itemId: w.id })}
+                  >
+                    {w.form_code} · {w.period_from} – {w.period_to}
+                  </Link>
+                ),
+              },
+              { header: "Status", cell: (w) => w.status.replace("_", " ") },
+              { header: "Note", hideOnMobile: true, cell: (w) => w.reason ?? "" },
+            ]}
+          />
+          <details className="mt-3 rounded-md border border-[var(--border)] p-3">
+            <summary className="cursor-pointer text-sm">Prepare a workpaper</summary>
+            <div className="mt-3">
+              <ActionForm action={workpaperAction} submitLabel="Prepare">
+                <input type="hidden" name="clientId" value={client.id} />
+                <input type="hidden" name="op" value="prepare" />
+                <input type="hidden" name="idempotencyKey" value={randomUUID()} />
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <Field label="Form code" name="code" maxLength={40} />
+                  <Field label="Period from" name="from" type="date" />
+                  <Field label="Period to" name="to" type="date" />
+                </div>
+                <TextArea
+                  label="Manual lines (line | value | reason | reference)"
+                  name="manual"
+                  rows={3}
+                />
+                <TextArea
+                  label="Overrides of source lines (line | value | reason | reference)"
+                  name="overrides"
+                  rows={2}
+                  hint="Recorded with the computed value and flagged on the workpaper."
                 />
               </ActionForm>
             </div>
