@@ -27,8 +27,8 @@ This implements the design in [doc 07](../07-security-and-tenant-isolation.md) a
 
 | Layer | Mechanism | Where |
 |---|---|---|
-| Database (authoritative) | RLS **enabled and forced** on every public table; SECURITY DEFINER helpers in the non-exposed `private` schema; table grants reduced to the minimum (Supabase's broad defaults are revoked) | `supabase/migrations/20261010120100_*.sql` |
-| Database functions | All membership, role, invitation and account changes go through checked functions that re-derive the caller from `auth.uid()`, check authority and SoD, and audit | `20261010120200_*.sql` |
+| Database (authoritative) | RLS **enabled and forced** on every public table; SECURITY DEFINER helpers in the non-exposed `private` schema; table grants reduced to the minimum (Supabase's broad defaults are revoked) | `supabase/migrations/0002_*.sql` |
+| Database functions | All membership, role, invitation and account changes go through checked functions that re-derive the caller from `auth.uid()`, check authority and SoD, and audit | `0003_*.sql` |
 | Server | Every server action calls `requireActionAccess()` plus a role check **before** calling the database. Pages call `requirePageAccess()` | `src/server/auth/access.ts`, `src/features/*/actions.ts` |
 | Routes (Phase 4) | `guardRoute()` in every protected page evaluates the shared route policy; proxy 307 without a session; navigation generated from the same policy | `src/lib/access/route-policy.ts`, `src/server/auth/route-guard.ts` |
 | UI | Hides controls the user cannot use. **This is not a security control.** | `src/app/**` |

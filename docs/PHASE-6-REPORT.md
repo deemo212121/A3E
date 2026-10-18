@@ -25,12 +25,12 @@
 - The download route.
 
 **Migrations:**
-- `20261010160000` intake_core
-- `160100` intake_functions
-- `160200` intake_imports
-- `160300` intake_ledger_link
-- `160400` intake_read_models
-- `160500` intake_lint_fixes
+- `0015` intake_core
+- `0016` intake_functions
+- `0017` intake_imports
+- `0018` intake_ledger_link
+- `0019` intake_read_models
+- `0020` intake_lint_fixes
 
 All are applied to the dev project, and `supabase db lint` reports **no errors**.
 
@@ -59,7 +59,7 @@ All are applied to the dev project, and `supabase db lint` reports **no errors**
 | Two return columns of `begin_document_upload` had the same names as table columns (ambiguous inside PL/pgSQL) | Review before running | Renamed outputs |
 | A pending (never finished) upload could have blocked a real upload of the same file | Design review | Only completed uploads count for duplicate detection |
 | Direct API uploads would have bypassed the server's byte checks | Design review | Removed the storage insert policy. Only the server writes bytes, to the path the user's authorized call created. |
-| Schema lint: IMMUTABLE functions calling STABLE ones; an untyped empty array; unused session variables | `supabase db lint` | Follow-up migration `160500` (applied migrations are never edited). Lint is clean. |
+| Schema lint: IMMUTABLE functions calling STABLE ones; an untyped empty array; unused session variables | `supabase db lint` | Follow-up migration `0020` (applied migrations are never edited). Lint is clean. |
 | Import page showed the wrong "type" after checking rows (React resets forms after an action) | Browser e2e screenshot | The mapping form re-mounts with the saved values |
 | Uploads chosen before the page finished loading were lost (the e2e test hit this) | Browser e2e | Tests wait for the page to settle. Real users rarely hit it; noted under §4. |
 

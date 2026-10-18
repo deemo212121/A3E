@@ -4,7 +4,7 @@
 --     (jsonb_build_object is STABLE);
 --   * typed empty arrays in the completeness checks;
 --   * the session check is a PERFORM instead of an unused variable.
--- Generated from 20261010160100 / 20261010160200 with only these edits.
+-- Generated from 0016 / 0017 with only these edits.
 
 create or replace function private.clean_profile_fields(p_fields jsonb) returns jsonb
 language plpgsql stable set search_path = '' as $$

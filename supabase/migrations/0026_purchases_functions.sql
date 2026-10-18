@@ -1126,4 +1126,4 @@ to authenticated;
 grant execute on function private.is_tax_config_editor() to authenticated;
 
 insert into supabase_migrations.schema_migrations (version, name)
-values ('20261010180200', 'purchases_functions') on conflict (version) do nothing;
+values ('0026', 'purchases_functions') on conflict (version) do nothing;

@@ -549,4 +549,4 @@ grant execute on function private.payroll_level(uuid), private.can_view_payroll(
   private.can_prepare_payroll(uuid), private.can_approve_payroll(uuid) to authenticated;
 
 insert into supabase_migrations.schema_migrations (version, name)
-values ('20261010200100', 'payroll_core') on conflict (version) do nothing;
+values ('0031', 'payroll_core') on conflict (version) do nothing;

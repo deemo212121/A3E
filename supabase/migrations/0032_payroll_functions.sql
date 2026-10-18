@@ -1506,4 +1506,4 @@ grant execute on function
 to authenticated;
 
 insert into supabase_migrations.schema_migrations (version, name)
-values ('20261010200200', 'payroll_functions') on conflict (version) do nothing;
+values ('0032', 'payroll_functions') on conflict (version) do nothing;

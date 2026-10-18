@@ -364,4 +364,4 @@ create policy supplier_payment_allocations_select on public.supplier_payment_all
   using (private.can_read_client(client_id));
 
 insert into supabase_migrations.schema_migrations (version, name)
-values ('20261010180100', 'purchases_core') on conflict (version) do nothing;
+values ('0025', 'purchases_core') on conflict (version) do nothing;

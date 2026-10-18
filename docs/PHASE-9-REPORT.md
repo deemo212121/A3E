@@ -73,6 +73,6 @@ The ❓ questions for the CPA are listed in [COSTING-METHOD.md](inventory/COSTIN
 
 If you haven't yet, run the Phase 7 and 8 files first. Then:
 
-1. `supabase/migrations/20261010190000_inventory_enums.sql`, on its own
-2. `supabase/migrations/20261010190100_inventory_core.sql`
-3. `supabase/migrations/20261010190200_inventory_functions.sql`
+1. `supabase/migrations/0027_inventory_enums.sql`, on its own
+2. `supabase/migrations/0028_inventory_core.sql`
+3. `supabase/migrations/0029_inventory_functions.sql`

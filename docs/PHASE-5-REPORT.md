@@ -29,14 +29,14 @@
 | Staff UI | `/staff/clients/[id]/` **journal** (list and create), **journal/[entry]** (submit, approve, return, void, reverse, edit draft), **trial-balance**, **ledger**, **accounts**, **periods**; review queue now shows real submitted entries. All are added to the shared route policy and navigation tabs. |
 
 **Migrations (all applied to the dev project; `db lint` clean):**
-- `20261010140000_accounting_core`
-- `…140100_accounting_functions`
-- `…140200_coa_template_proposed`
-- `…140300_fix_create_fiscal_year_lint`
-- `…140400_save_draft_concurrent_idempotency`
-- `…140500_fix_purge_order`
-- `…140600_fix_purge_reversals`
-- `…140700_ledger_reads_as_text`
+- `0005_accounting_core`
+- `…0006_accounting_functions`
+- `…0007_coa_template_proposed`
+- `…0008_fix_create_fiscal_year_lint`
+- `…0009_save_draft_concurrent_idempotency`
+- `…0010_fix_purge_order`
+- `…0011_fix_purge_reversals`
+- `…0012_ledger_reads_as_text`
 
 ## 3. Tests actually executed (2026-10-10)
 
@@ -55,9 +55,9 @@
 | Problem | Found by | Fix |
 |---|---|---|
 | The deferred balance check could run as the API user and count lines **through RLS** | Design review before testing | Integrity trigger functions run as SECURITY DEFINER |
-| Concurrent saves with the same idempotency key: one caller got an error (no duplicate was created) | Concurrency design review | Atomic `insert … on conflict do nothing` + return (migration 140400); proven live with 6 parallel requests |
-| Test-data purge failed: FK checked before cascaded lines were deleted; then a rewrite violated maker-checker on reversals | **Live suite cleanup** (left data behind) | Explicit leaf-first deletes (140500, 140600). The PGlite purge test now includes a reversal and was shown to **fail without the fix**. Leftovers purged. |
-| JSON numbers for money (floats in JavaScript) | Design review | Read models return text (140700); the UI uses BigInt centavos |
+| Concurrent saves with the same idempotency key: one caller got an error (no duplicate was created) | Concurrency design review | Atomic `insert … on conflict do nothing` + return (migration 0009); proven live with 6 parallel requests |
+| Test-data purge failed: FK checked before cascaded lines were deleted; then a rewrite violated maker-checker on reversals | **Live suite cleanup** (left data behind) | Explicit leaf-first deletes (0010, 0011). The PGlite purge test now includes a reversal and was shown to **fail without the fix**. Leftovers purged. |
+| JSON numbers for money (floats in JavaScript) | Design review | Read models return text (0012); the UI uses BigInt centavos |
 | `route-policy.ts` was corrupted by my own edit script (`$` patterns in JS `replace`) | Typecheck / format | File rewritten from the known-good version; policy tests 45/45 |
 | Route-test classifier truncated `staff.trial_balance` (regex without `_`) | Live route suite | Regex fixed (test bug, not an access bug) |
 | Stale `tsconfig.tsbuildinfo` after raising the TS target to ES2022 (BigInt) | Typecheck | Cache cleared |
@@ -81,8 +81,8 @@ Done at the owner's request after reviewing one client's workbooks ([accounting/
 
 | Change | Where |
 |---|---|
-| 20 accounts added to the PROPOSED starter chart (now 57): petty cash fund, advances to employees, raw materials, payroll liabilities by agency, employee loans payable, VAT payable placeholder, purchases, employer contributions, benefits, repairs, fuel, transportation, communication, taxes and licenses, meals, representation | Migration `20261010150100`; [COA-TEMPLATE-PROPOSED.md](accounting/COA-TEMPLATE-PROPOSED.md) |
-| Optional **supplier/customer name, TIN and receipt/invoice no.** on each journal line. The TIN is format-checked (9 digits + optional 3–5 digit branch code) and stored in dashed form. A TIN requires a name. The fields freeze on posting (existing line guard), are copied into reversals, and are returned by `general_ledger`. | Migration `20261010150000`; entry form (optional per-line details), entry page, ledger page |
+| 20 accounts added to the PROPOSED starter chart (now 57): petty cash fund, advances to employees, raw materials, payroll liabilities by agency, employee loans payable, VAT payable placeholder, purchases, employer contributions, benefits, repairs, fuel, transportation, communication, taxes and licenses, meals, representation | Migration `0014`; [COA-TEMPLATE-PROPOSED.md](accounting/COA-TEMPLATE-PROPOSED.md) |
+| Optional **supplier/customer name, TIN and receipt/invoice no.** on each journal line. The TIN is format-checked (9 digits + optional 3–5 digit branch code) and stored in dashed form. A TIN requires a name. The fields freeze on posting (existing line guard), are copied into reversals, and are returned by `general_ledger`. | Migration `0013`; entry form (optional per-line details), entry page, ledger page |
 | **Scenario S3**: one synthetic month in the Firm's format (CDJ, CRJ, two payrolls, petty cash, a reversed duplicate) with a hard-coded trial balance | `tests/db/business-month.test.ts`; [TEST-SCENARIOS.md](accounting/TEST-SCENARIOS.md) |
 
 **Tests run 2026-10-10:**

@@ -1,5 +1,5 @@
 -- Phase 10 (payroll and statutory contributions), part 1 of 3: types.
--- Run on its own, before 200100.
+-- Run on its own, before 0031.
 
 create type public.payroll_access_level as enum ('view', 'prepare', 'approve');
 create type public.payroll_frequency as enum ('monthly', 'semi_monthly');
@@ -14,4 +14,4 @@ create type public.payroll_item_unit as enum ('amount', 'days', 'hours');
 create type public.payroll_payment_kind as enum ('net_pay', 'sss', 'philhealth', 'pagibig', 'withholding', 'deduction');
 
 insert into supabase_migrations.schema_migrations (version, name)
-values ('20261010200000', 'payroll_enums') on conflict (version) do nothing;
+values ('0030', 'payroll_enums') on conflict (version) do nothing;

@@ -830,4 +830,4 @@ grant execute on function
 to authenticated;
 
 insert into supabase_migrations.schema_migrations (version, name)
-values ('20261010190200', 'inventory_functions') on conflict (version) do nothing;
+values ('0029', 'inventory_functions') on conflict (version) do nothing;

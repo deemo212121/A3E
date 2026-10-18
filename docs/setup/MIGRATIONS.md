@@ -4,11 +4,19 @@ All database changes (tables, RLS policies, functions, triggers, grants) are mad
 
 > **Phase 2 status:** the workflow is configured, but **no migrations exist yet**. The first schema (identity, tenancy and audit) arrives in the next approved phase. The local stack has not yet been run on this machine because Docker is not installed (D-12 deferred).
 
+## File names
+
+Migrations are numbered in order: `0001_identity_core.sql`, `0002_…`, and so on (four digits, so they sort correctly). A new file takes the next number. Each file ends with an insert into `supabase_migrations.schema_migrations` using that number, e.g. `values ('0036', 'my_change')`.
+
+**Running them:** the owner runs new files by hand, one at a time and in number order, in the Supabase SQL Editor. Files already run are never edited; a fix is a new file.
+
+File names used timestamps until 2026-10-18. `0035_renumber_migration_history.sql` updates databases that recorded the old names.
+
 ## Daily workflow
 
 ```bash
 npm run db:start                       # start local Supabase (Docker)
-npm run db:new create_client_tables    # creates supabase/migrations/<timestamp>_create_client_tables.sql
+npm run db:new create_client_tables    # creates a <timestamp>_ file: rename it to the next number (e.g. 0036_create_client_tables.sql)
 # edit the SQL file
 npm run db:reset                       # rebuild local DB from ALL migrations + seed
 npm run db:lint                        # Postgres linter

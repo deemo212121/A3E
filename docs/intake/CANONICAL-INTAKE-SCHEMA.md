@@ -1,6 +1,6 @@
 # Canonical Intake Schema (Phase 6)
 
-**Status:** implemented on 2026-10-10 (migrations `20261010160000`–`20261010160500`). This is the shared shape that the later sales, purchase, expense, inventory and payroll modules build on. **Nothing here computes tax.** Amounts such as VAT and withholding are recorded *as printed on the document*.
+**Status:** implemented on 2026-10-10 (migrations `0015`–`0020`). This is the shared shape that the later sales, purchase, expense, inventory and payroll modules build on. **Nothing here computes tax.** Amounts such as VAT and withholding are recorded *as printed on the document*.
 
 ## 1. Records
 

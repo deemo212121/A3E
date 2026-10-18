@@ -244,4 +244,4 @@ grant execute on function
 to authenticated;
 
 insert into supabase_migrations.schema_migrations (version, name)
-values ('20261011210000', 'reporting') on conflict (version) do nothing;
+values ('0033', 'reporting') on conflict (version) do nothing;

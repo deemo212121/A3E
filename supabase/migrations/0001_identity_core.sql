@@ -1,6 +1,6 @@
 -- Phase 3: identity, firm/client tenancy and audit (core objects).
--- Authorization helpers and RLS policies: 20261010120100_*.sql
--- Membership/invitation functions:           20261010120200_*.sql
+-- Authorization helpers and RLS policies: 0002_*.sql
+-- Membership/invitation functions:           0003_*.sql
 
 -- ---------------------------------------------------------------------------
 -- Schemas

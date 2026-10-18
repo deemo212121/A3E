@@ -43,7 +43,7 @@ end;
 $$;
 revoke execute on function private.normalize_tin(text) from public, anon, authenticated;
 
--- save_draft_entry: identical to 20261010140400 except the line insert, which
+-- save_draft_entry: identical to 0009 except the line insert, which
 -- now also stores counterparty_name, counterparty_tin and document_ref.
 create or replace function public.save_draft_entry(
   p_client_id uuid,
@@ -147,7 +147,7 @@ begin
 end;
 $$;
 
--- reverse_entry: identical to 20261010140100 except the reversal lines now
+-- reverse_entry: identical to 0006 except the reversal lines now
 -- carry the original lines' counterparty and document fields.
 create or replace function public.reverse_entry(
   p_entry_id uuid, p_reversal_date date, p_reason text, p_idempotency_key text
@@ -228,7 +228,7 @@ begin
 end;
 $$;
 
--- general_ledger: same as 20261010140700 plus the line's counterparty and
+-- general_ledger: same as 0012 plus the line's counterparty and
 -- document number, so the ledger shows "who" and "which receipt".
 drop function public.general_ledger(uuid, uuid, date, date);
 

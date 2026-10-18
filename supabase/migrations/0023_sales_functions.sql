@@ -1073,7 +1073,7 @@ $$;
 
 -- ---------------------------------------------------------------------------
 -- An intake transaction recorded as a sales invoice must not ALSO be booked
--- through a journal entry (and vice versa): same function as 160300 plus
+-- through a journal entry (and vice versa): same function as 0018 plus
 -- that check.
 -- ---------------------------------------------------------------------------
 create or replace function private.intake_ledger_sync() returns trigger
@@ -1231,4 +1231,4 @@ grant execute on function
 to authenticated;
 
 insert into supabase_migrations.schema_migrations (version, name)
-values ('20261010170200', 'sales_functions') on conflict (version) do nothing;
+values ('0023', 'sales_functions') on conflict (version) do nothing;

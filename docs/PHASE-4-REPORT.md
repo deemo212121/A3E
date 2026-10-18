@@ -21,7 +21,7 @@
 | Route-access tests | Unit (policy matrix + navigation consistency) and **live** (production build, real sessions, direct URLs); see §3 |
 
 Supporting changes:
-- **Migration `20261010130000_access_summary_assignments.sql`:** `get_my_access` now also returns `staff_client_ids`, so the guards and the navigation know staff assignments. Applied to the dev project; `db lint` is clean.
+- **Migration `0004_access_summary_assignments.sql`:** `get_my_access` now also returns `staff_client_ids`, so the guards and the navigation know staff assignments. Applied to the dev project; `db lint` is clean.
 - **Server:** per-request memoization of the access lookup (React `cache`); the proxy now reports session presence; the post-login `next` redirect accepts same-site paths only.
 - **New actions:** update own profile name, update a client's name or status (firm admin/manager; the database re-checks).
 - The previous single `/app/admin` and `/app/clients/[id]` pages were **replaced** by the workspace routes.
@@ -84,7 +84,7 @@ What the live route suite proves, over **25 URLs × 9 signed-in personas** (firm
   - `src/components/shell/*`, `src/components/ui/{primitives,data-table,access-states,toast,sub-nav}.tsx`
   - `src/features/{account/actions.ts, portal/client-page.tsx}`, `src/features/auth/schemas.test.ts`
   - `src/app/(workspace)/**` (18 pages, layout, loading, error), `src/app/not-found.tsx`
-  - `supabase/migrations/20261010130000_*.sql`, `tests/db/access-summary.test.ts`, `tests/routes/*`, `vitest.routes.config.mts`
+  - `supabase/migrations/0004_*.sql`, `tests/db/access-summary.test.ts`, `tests/routes/*`, `vitest.routes.config.mts`
   - `docs/design/*`, this report
 - **Updated:** `src/app/{layout,page,globals.css}`, `src/app/login/page.tsx`, `src/proxy.ts`, `src/lib/supabase/proxy-session.ts`, `src/server/auth/access.ts`, `src/components/ui/action-form.tsx`, `src/features/{auth,admin}/actions.ts`, `package.json` (`test:routes`), `docs/README.md`
 - **Removed:** `src/app/app/**` (replaced by workspaces)

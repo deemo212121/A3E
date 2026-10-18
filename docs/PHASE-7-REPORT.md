@@ -45,8 +45,8 @@
 
 ## 4. SQL to run (Supabase → SQL Editor), in this order, one file at a time
 
-1. `supabase/migrations/20261010170000_sales_enums.sql`, run on its own first
-2. `supabase/migrations/20261010170100_sales_core.sql`
-3. `supabase/migrations/20261010170200_sales_functions.sql`
+1. `supabase/migrations/0021_sales_enums.sql`, run on its own first
+2. `supabase/migrations/0022_sales_core.sql`
+3. `supabase/migrations/0023_sales_functions.sql`
 
 Each file records itself in the migration history, so `db push` won't re-apply it.

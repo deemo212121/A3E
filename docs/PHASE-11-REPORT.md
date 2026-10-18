@@ -65,5 +65,5 @@ The questions are listed in ACCOUNTING-POLICIES.md:
 
 ## 5. SQL to run (Supabase → SQL Editor)
 
-1. `supabase/migrations/20261011210000_reporting.sql`
-2. If not yet done: `supabase/migrations/20261012220000_beta_disable_staff_mfa.sql`
+1. `supabase/migrations/0033_reporting.sql`
+2. If not yet done: `supabase/migrations/0034_beta_disable_staff_mfa.sql`

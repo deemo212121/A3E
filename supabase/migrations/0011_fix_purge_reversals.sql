@@ -1,4 +1,4 @@
--- Fix to 20261010140500: do not rewrite entries before deleting them (rewriting a
+-- Fix to 0010: do not rewrite entries before deleting them (rewriting a
 -- reversal's type violated the maker-checker CHECK). Deleting all of a client's
 -- entries in one statement already satisfies their self-references.
 create or replace function public.purge_synthetic_client(p_client_id uuid) returns void

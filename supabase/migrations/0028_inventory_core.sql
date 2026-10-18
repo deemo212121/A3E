@@ -308,4 +308,4 @@ create policy inventory_movement_lines_select on public.inventory_movement_lines
 create policy inventory_ledger_select on public.inventory_ledger for select to authenticated using (private.can_read_client(client_id));
 
 insert into supabase_migrations.schema_migrations (version, name)
-values ('20261010190100', 'inventory_core') on conflict (version) do nothing;
+values ('0028', 'inventory_core') on conflict (version) do nothing;

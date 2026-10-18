@@ -27,9 +27,9 @@
 
 | Migration | Content |
 |---|---|
-| `20261010120000_identity_core.sql` | `private` and `audit` schemas, enums, 7 tables, triggers (updated_at, client_id immutability, assignment check, profile provisioning, audit) |
-| `20261010120100_authorization_rls.sql` | 11 helper functions, minimal grants (Supabase defaults revoked), RLS enabled and forced, 11 policies |
-| `20261010120200_membership_functions.sql` | 15 checked functions: access summary, clients, assignments, invitations, membership and role changes, disable, MFA reset authorization, bootstrap |
+| `0001_identity_core.sql` | `private` and `audit` schemas, enums, 7 tables, triggers (updated_at, client_id immutability, assignment check, profile provisioning, audit) |
+| `0002_authorization_rls.sql` | 11 helper functions, minimal grants (Supabase defaults revoked), RLS enabled and forced, 11 policies |
+| `0003_membership_functions.sql` | 15 checked functions: access summary, clients, assignments, invitations, membership and role changes, disable, MFA reset authorization, bootstrap |
 
 They were applied with `supabase db push`. `supabase db lint` on public, private and audit reported **no errors**.
 

@@ -77,6 +77,6 @@ What the tests cover:
 
 First, Phases 7–9 must be applied. Then:
 
-1. `supabase/migrations/20261010200000_payroll_enums.sql`, on its own
-2. `supabase/migrations/20261010200100_payroll_core.sql`
-3. `supabase/migrations/20261010200200_payroll_functions.sql`
+1. `supabase/migrations/0030_payroll_enums.sql`, on its own
+2. `supabase/migrations/0031_payroll_core.sql`
+3. `supabase/migrations/0032_payroll_functions.sql`

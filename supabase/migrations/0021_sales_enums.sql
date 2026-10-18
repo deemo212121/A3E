@@ -1,6 +1,6 @@
 -- Phase 7 (sales and receivables), part 1 of 3: types.
 -- Kept separate because new enum values cannot be used in the same
--- transaction that adds them. Run this file on its own, before 170100.
+-- transaction that adds them. Run this file on its own, before 0022.
 
 alter type public.intake_subject add value if not exists 'sales_invoice';
 alter type public.intake_subject add value if not exists 'credit_note';
@@ -15,4 +15,4 @@ create type public.sales_doc_status as enum ('draft', 'submitted', 'posted', 'ca
 create type public.sales_tax_class as enum ('vatable', 'zero_rated', 'exempt', 'not_subject');
 
 insert into supabase_migrations.schema_migrations (version, name)
-values ('20261010170000', 'sales_enums') on conflict (version) do nothing;
+values ('0021', 'sales_enums') on conflict (version) do nothing;

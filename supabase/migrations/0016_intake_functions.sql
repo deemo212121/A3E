@@ -742,7 +742,7 @@ language sql stable security definer set search_path = '' as $$
     when 'counterparty' then (select client_id from public.counterparties where id = p_id)
     when 'transaction' then (select client_id from public.intake_transactions where id = p_id)
     when 'document' then (select client_id from public.documents where id = p_id)
-    when 'import_batch' then null -- defined with the import tables (20261010160200)
+    when 'import_batch' then null -- defined with the import tables (0017)
   end;
 $$;
 

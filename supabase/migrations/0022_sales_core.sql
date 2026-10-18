@@ -341,7 +341,7 @@ create trigger audit_sales_receipt_allocations after insert or update or delete 
 
 -- ---------------------------------------------------------------------------
 -- RLS: SELECT only, for users who can read the client. Writes go through
--- functions (20261010170200). tax_rates is reference data readable by all
+-- functions (0023). tax_rates is reference data readable by all
 -- signed-in users.
 -- ---------------------------------------------------------------------------
 revoke all on table public.tax_rates, public.sales_settings, public.sales_invoices, public.sales_invoice_lines,
@@ -387,4 +387,4 @@ create policy sales_receipt_allocations_select on public.sales_receipt_allocatio
   using (private.can_read_client(client_id));
 
 insert into supabase_migrations.schema_migrations (version, name)
-values ('20261010170100', 'sales_core') on conflict (version) do nothing;
+values ('0022', 'sales_core') on conflict (version) do nothing;

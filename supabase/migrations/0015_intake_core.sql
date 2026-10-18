@@ -11,9 +11,9 @@
 --
 -- Nothing here posts to the ledger. Intake data reaches the books only when an
 -- APPROVED transaction is booked through a journal entry that itself passes
--- maker-checker (see 20261010160300).
+-- maker-checker (see 0018).
 --
--- Writes happen ONLY through SECURITY DEFINER functions (20261010160100);
+-- Writes happen ONLY through SECURITY DEFINER functions (0016);
 -- authenticated users get SELECT, filtered by RLS. Tax-related fields are
 -- recorded "as stated on the document"; nothing is computed.
 

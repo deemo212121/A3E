@@ -60,8 +60,8 @@ What `tests/db/purchases.test.ts` covers:
 
 ## 4. SQL to run (Supabase → SQL Editor), in order, one file at a time
 
-If you haven't yet, run the Phase 7 files (`20261010170000`, `170100`, `170200`) first. Then:
+If you haven't yet, run the Phase 7 files (`0021`, `0022`, `0023`) first. Then:
 
-1. `supabase/migrations/20261010180000_purchases_enums.sql`, on its own
-2. `supabase/migrations/20261010180100_purchases_core.sql`
-3. `supabase/migrations/20261010180200_purchases_functions.sql`
+1. `supabase/migrations/0024_purchases_enums.sql`, on its own
+2. `supabase/migrations/0025_purchases_core.sql`
+3. `supabase/migrations/0026_purchases_functions.sql`
