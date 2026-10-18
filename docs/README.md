@@ -40,6 +40,8 @@
 | tax | [Tax engine](tax/TAX-ENGINE.md) | Registry, formula language, approval gate, computation statuses, lineage |
 | — | [Phase 13 report](PHASE-13-REPORT.md) | BIR forms framework: definitions, workpapers, traceability, sign-off (no forms shipped) |
 | tax | [Forms](tax/FORMS.md) | Form definitions, verification and sign-off gates, workpapers, exports |
+| — | [Phase 14 report](PHASE-14-REPORT.md) | Electronic outputs (DAT, alphalists, SLSP, QAP, SAWT) framework and e-invoicing register |
+| tax | [Electronic outputs](tax/ELECTRONIC-OUTPUTS.md) | Specifications, generation, validation, reconciliation, official results, e-invoicing evidence |
 | sales | [Posting rules](sales/POSTING-RULES.md) | Sales journal entries, rounding, controls (pending CPA review) |
 | intake | [Canonical intake schema](intake/CANONICAL-INTAKE-SCHEMA.md) | Transactions, customers/suppliers, documents, imports, workflow and retry rules (Phase 6) |
 | accounting | [Test scenarios (for accountant sign-off)](accounting/TEST-SCENARIOS.md) · [Starter chart of accounts (PROPOSED)](accounting/COA-TEMPLATE-PROPOSED.md) · [Review of the Firm's client workbooks](accounting/FIRM-WORKBOOK-REVIEW.md) | Phase 5 |

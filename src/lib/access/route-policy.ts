@@ -99,6 +99,9 @@ export type RouteKey =
   | "tax_forms"
   | "tax_form"
   | "staff.workpaper"
+  | "eoutputs"
+  | "eoutput"
+  | "staff.output_run"
   | "staff.payroll"
   | "staff.payroll_run"
   | "staff.payroll_employee"
@@ -172,6 +175,8 @@ export function evaluateRoute(
     case "tax_rule":
     case "tax_forms":
     case "tax_form":
+    case "eoutputs":
+    case "eoutput":
       return hasRole(facts, STAFF_ROLES) ? ALLOW : FORBIDDEN;
     case "staff.client":
     case "staff.accounts":
@@ -185,6 +190,7 @@ export function evaluateRoute(
     case "staff.tax":
     case "staff.tax_computation":
     case "staff.workpaper":
+    case "staff.output_run":
     case "staff.intake":
     case "staff.intake_txn":
     case "staff.imports":
@@ -289,6 +295,12 @@ export function pathFor(route: RouteKey, params: RouteParams = {}): string {
       return `/tax-forms/${item}`;
     case "staff.workpaper":
       return `/staff/clients/${id}/tax/workpapers/${item}`;
+    case "eoutputs":
+      return "/e-outputs";
+    case "eoutput":
+      return `/e-outputs/${item}`;
+    case "staff.output_run":
+      return `/staff/clients/${id}/tax/outputs/${item}`;
     case "staff.tax":
       return `/staff/clients/${id}/tax`;
     case "staff.tax_computation":
@@ -398,6 +410,9 @@ const MATCHERS: Matcher[] = [
   [/^\/tax-forms$/, "tax_forms"],
   [new RegExp(`^/tax-forms/()(${UUID})$`), "tax_form", "itemId"],
   [new RegExp(`${STAFF_CLIENT}/tax/workpapers/(${UUID})$`), "staff.workpaper", "itemId"],
+  [/^\/e-outputs$/, "eoutputs"],
+  [new RegExp(`^/e-outputs/()(${UUID})$`), "eoutput", "itemId"],
+  [new RegExp(`${STAFF_CLIENT}/tax/outputs/(${UUID})$`), "staff.output_run", "itemId"],
   [new RegExp(`${STAFF_CLIENT}/tax$`), "staff.tax"],
   [new RegExp(`${STAFF_CLIENT}/tax/(${UUID})$`), "staff.tax_computation", "itemId"],
   [new RegExp(`${STAFF_CLIENT}$`), "staff.client"],
@@ -468,6 +483,7 @@ export const PROTECTED_PREFIXES = [
   "/admin",
   "/tax-rules",
   "/tax-forms",
+  "/e-outputs",
 ];
 
 // ---------------------------------------------------------------------------
@@ -514,6 +530,7 @@ export function buildNavigation(facts: AccessFacts): NavSection[] {
         ...item(facts, "staff", "My clients"),
         ...item(facts, "tax_rules", "Tax rules registry"),
         ...item(facts, "tax_forms", "Tax forms registry"),
+        ...item(facts, "eoutputs", "Electronic outputs & e-invoicing"),
       ],
     },
     {

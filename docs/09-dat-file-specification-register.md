@@ -2,6 +2,8 @@
 
 > **Status: no field-level file specification has been obtained yet.** This register tracks which specifications exist, where they are published, and what must be obtained before generators (module M16) are built. **No DAT generator may be built from reverse-engineered or third-party layouts** (master rule 4).
 
+> **2026-10-18 (Phase 14):** the generator, validation report, reconciliation and the "validated only after the official tool passed" rule are built (docs/tax/ELECTRONIC-OUTPUTS.md). Every row below is still OPEN. **No layout has been entered**, because none of the field-level specs has been obtained yet.
+
 ## 1. Register
 
 | ID | File | Attached to / purpose | Governing issuance (as found) | Official tool / validator | Field-level spec obtained? | Spec location to obtain | Status |

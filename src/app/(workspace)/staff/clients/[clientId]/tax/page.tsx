@@ -10,6 +10,7 @@ import { Alert, Badge, PageSkeleton, Section } from "@/components/ui/primitives"
 import { renderStaffClientPage } from "@/features/ledger/staff-client-frame";
 import { taxClientAction } from "@/features/tax/actions";
 import { workpaperAction } from "@/features/tax/form-actions";
+import { outputRunAction } from "@/features/tax/output-actions";
 import { STATUS_TONE } from "@/features/tax/labels";
 import { pathFor } from "@/lib/access/route-policy";
 import { listAccounts } from "@/server/data/ledger";
@@ -22,6 +23,7 @@ import {
 } from "@/server/data/tax";
 import { getTaxRule } from "@/server/data/tax";
 import { listWorkpapers } from "@/server/data/forms";
+import { listAssessments, listRequirements, listRuns } from "@/server/data/eoutputs";
 
 export const metadata: Metadata = { title: "Tax" };
 
@@ -46,7 +48,13 @@ async function Tax({ params }: { params: Promise<{ clientId: string }> }) {
       listTaxRules(),
       listAccounts(client.id),
     ]);
-    const workpapers = await listWorkpapers(client.id);
+    const [workpapers, outputRuns, requirements, assessments] = await Promise.all([
+      listWorkpapers(client.id),
+      listRuns(client.id),
+      listRequirements(),
+      listAssessments(client.id),
+    ]);
+    const latest = (reqId: string) => assessments.find((a) => a.requirement_id === reqId);
     const hidden = (op: string, id = "") => (
       <>
         <input type="hidden" name="clientId" value={client.id} />
@@ -311,6 +319,129 @@ async function Tax({ params }: { params: Promise<{ clientId: string }> }) {
                   rows={2}
                   hint="Recorded with the computed value and flagged on the workpaper."
                 />
+              </ActionForm>
+            </div>
+          </details>
+        </Section>
+
+        <Section title="Electronic outputs (DAT, alphalists, SLSP, QAP, SAWT)">
+          <DataTable
+            caption="Electronic outputs"
+            rows={outputRuns}
+            rowKey={(r) => r.id}
+            empty="No files generated yet."
+            columns={[
+              {
+                header: "Output / period",
+                cell: (r) => (
+                  <Link
+                    className="font-medium text-[var(--accent)] hover:underline"
+                    href={pathFor("staff.output_run", { clientId: client.id, itemId: r.id })}
+                  >
+                    {r.output_code} · {r.period_from} – {r.period_to}
+                  </Link>
+                ),
+              },
+              {
+                header: "Status",
+                cell: (r) => (
+                  <Badge
+                    tone={
+                      r.status === "validated" || r.status === "signed_off"
+                        ? "success"
+                        : r.status === "generated"
+                          ? "warning"
+                          : "neutral"
+                    }
+                  >
+                    {r.status === "generated"
+                      ? "generated: not validated"
+                      : r.status.replace("_", " ")}
+                  </Badge>
+                ),
+              },
+              { header: "Note", hideOnMobile: true, cell: (r) => r.reason ?? "" },
+            ]}
+          />
+          <details className="mt-3 rounded-md border border-[var(--border)] p-3">
+            <summary className="cursor-pointer text-sm">Generate a file</summary>
+            <div className="mt-3">
+              <ActionForm action={outputRunAction} submitLabel="Generate">
+                <input type="hidden" name="clientId" value={client.id} />
+                <input type="hidden" name="op" value="generate" />
+                <input type="hidden" name="idempotencyKey" value={randomUUID()} />
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <Field label="Output code" name="code" maxLength={40} />
+                  <Field label="Period from" name="from" type="date" />
+                  <Field label="Period to" name="to" type="date" />
+                </div>
+              </ActionForm>
+            </div>
+          </details>
+        </Section>
+
+        <Section title="E-invoicing compliance (evidence per requirement)">
+          <DataTable
+            caption="E-invoicing"
+            rows={requirements}
+            rowKey={(r) => r.id}
+            empty="No e-invoicing requirements recorded in the register yet."
+            columns={[
+              { header: "Requirement", cell: (r) => `${r.code} · ${r.title}` },
+              { header: "Verified", cell: (r) => (r.status === "verified" ? "yes" : "no") },
+              {
+                header: "This client",
+                cell: (r) => {
+                  const a = latest(r.id);
+                  return a
+                    ? `${a.status.replace(/_/g, " ")}${a.evidence ? ` (evidence: ${a.evidence})` : ""}`
+                    : "not assessed";
+                },
+              },
+            ]}
+          />
+          <details className="mt-3 rounded-md border border-[var(--border)] p-3">
+            <summary className="cursor-pointer text-sm">
+              Record an assessment (reviewer or manager)
+            </summary>
+            <div className="mt-3">
+              <ActionForm action={outputRunAction} submitLabel="Record">
+                <input type="hidden" name="clientId" value={client.id} />
+                <input type="hidden" name="op" value="assess" />
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <label className="flex flex-col gap-1 text-sm">
+                    Requirement
+                    <select
+                      name="requirementId"
+                      className="rounded-md border border-[var(--border)] bg-[var(--surface-raised)] px-2 py-1.5"
+                    >
+                      {requirements.map((r) => (
+                        <option key={r.id} value={r.id}>
+                          {r.code}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="flex flex-col gap-1 text-sm">
+                    Status
+                    <select
+                      name="status"
+                      className="rounded-md border border-[var(--border)] bg-[var(--surface-raised)] px-2 py-1.5"
+                    >
+                      <option value="not_assessed">Not assessed</option>
+                      <option value="not_applicable">Not applicable (give the reason)</option>
+                      <option value="required_not_met">Required, not met</option>
+                      <option value="in_progress">In progress</option>
+                      <option value="met">Met (give the evidence)</option>
+                    </select>
+                  </label>
+                </div>
+                <Field
+                  label="Evidence (certificate, registration, approval reference)"
+                  name="evidence"
+                  maxLength={2000}
+                />
+                <Field label="Note / reason" name="note" maxLength={2000} />
               </ActionForm>
             </div>
           </details>
